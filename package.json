@@ -3,9 +3,11 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+ "scripts": {
+  "start": "node index.js",
+  "client": "npm start --prefix client",
+  "dev": "concurrently \"npm start\" \"npm run client\""
+},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ibrahimfysl/Flexroom.git"
@@ -19,6 +21,7 @@
   },
   "homepage": "https://github.com/ibrahimfysl/Flexroom#readme",
   "dependencies": {
+    "concurrently": "^9.2.1",
     "express": "^5.2.1"
   }
 }

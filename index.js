@@ -7,6 +7,10 @@ app.get('/', (req, res) => {
     res.send('Flexroom Backend is officially up and running!');
 });
 
+app.get('/api/test', (req, res) => {
+    res.json({ message: "Hello from the Flexroom Backend!" });
+});
+
 app.listen(PORT, () => {
     console.log(`Server is live at http://localhost:${PORT}`);
 });
