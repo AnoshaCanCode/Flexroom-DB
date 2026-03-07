@@ -1,18 +1,27 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import logo from './logo.svg';
+import './App.css';
 
 function App() {
-  const [data, setData] = useState("");
+  const [backendMessage, setBackendMessage] = useState("Loading...");
 
   useEffect(() => {
-    fetch('/api/test')
+    // Calling the route we created in index.js
+    fetch('/api/message')
       .then(res => res.json())
-      .then(json => setData(json.message));
+      .then(data => setBackendMessage(data.text))
+      .catch(err => setBackendMessage("Could not connect to backend"));
   }, []);
 
   return (
     <div className="App">
-      <h1>Flexroom Frontend</h1>
-      <p>Server says: {data ? data : "Loading..."}</p>
+      <header className="App-header">
+        <img src={logo} className="App-logo" alt="logo" />
+        <h1>Flexroom Project</h1>
+        <p>
+          {backendMessage}
+        </p>
+      </header>
     </div>
   );
 }
