@@ -20,3 +20,32 @@ VALUES
 ('John Doe', 'johndoe.test@gmail.com', 'StudentPass789', 'student');
 
 SELECT * FROM Users;
+
+CREATE TABLE StudentProfiles (
+    UserID INT PRIMARY KEY NOT NULL,
+    EducationLevel NVARCHAR(50) NOT NULL check(EducationLevel IN ('school','college','graduate','postgraduate')),
+    EducationYear INT check(EducationYear >= 1),--school class level or higher education year
+    JoinClassNum INT DEFAULT 0, --number of classes joined
+    Foreign Key (UserID) REFERENCES Users
+);
+
+CREATE TABLE EvaluatorProfiles (
+    UserID INT PRIMARY KEY NOT NULL,
+    EvalClassNum INT DEFAULT 0, --number of classes evaluated
+    Foreign Key (UserID) REFERENCES Users
+);
+GO
+
+INSERT INTO StudentProfiles (UserID, EducationLevel, EducationYear) 
+VALUES 
+(2, 'graduate', 2),
+(3, 'graduate', 3),
+(5, 'graduate', 1);
+
+INSERT INTO EvaluatorProfiles (UserID) 
+VALUES 
+(1),
+(4);
+
+SELECT * FROM StudentProfiles;
+SELECT * FROM EvaluatorProfiles;
