@@ -1,14 +1,21 @@
 const express = require('express'); // 1. Load Express
 const sql = require('mssql');       // 2. Load SQL Driver
 const config = require('./dbconfig'); // 3. Load your DB Config
+const rateLimit = require('express-rate-limit');
 
 const app = express();               // 4. THIS IS THE MISSING LINE
 const PORT = 5000;
 
+// Configure rate limiter for /api/message route
+const messageLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // limit each IP to 100 requests per windowMs
+});
+
 // NOW you can define your routes
 // index.js (Main folder)
 
-app.get('/api/message', async (req, res) => {
+app.get('/api/message', messageLimiter, async (req, res) => {
     let responseData = {
         backendMsg: "Hello from the Flexroom Backend!",
         sqlMsg: "Loading SQL data..."
