@@ -103,3 +103,7 @@ VALUES
     (4, 4, 'Assignment 1 – SRS Document', 'document', 25, '2025-03-20', '2025-04-05', 'unmarked'),
     (5, 5, 'Lab 3 – BST Implementation', 'code', 15, '2025-09-01', NULL, 'unmarked'),
     (6, 5, 'Mid Exam – Data Structures', 'document', 50, '2025-10-01', '2025-10-15', 'unmarked');
+
+    SELET * FROM Course;
+    SELECT * FROM CourseClass;
+    SELECT * FROM Assessment;
