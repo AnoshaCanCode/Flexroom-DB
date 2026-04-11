@@ -22,7 +22,9 @@ VALUES
 SELECT * FROM Users;
 
 
-CREATE TABLE Submissions (
+    USE FlexroomDB;
+GO
+    create TABLE Submissions (
     SubmissionID INT PRIMARY KEY IDENTITY(1,1) NOT NULL,
     AssignmentID INT NOT NULL, 
     StudentID INT NOT NULL,    -- Foreign Key to Users table
@@ -31,10 +33,8 @@ CREATE TABLE Submissions (
     SubmissionDate DATETIME DEFAULT GETDATE(),
     Status NVARCHAR(50) DEFAULT 'On-Time',
     
-    CONSTRAINT FK_Submission_Student FOREIGN KEY (StudentID) 
-        REFERENCES Users(UserID) ON DELETE CASCADE,
-    Constraint FK_Submission_Assignment Foreign Key (AssignmentID)
-       References Assessment(assessmentID) on delete cascade
+    FOREIGN KEY (StudentID) REFERENCES Users(UserID) ON DELETE CASCADE,
+    Foreign Key (AssignmentID) References Assessment(assessmentID) on delete cascade
 );
 
 
@@ -53,16 +53,18 @@ CREATE TABLE MatchResults (
 );
 
 INSERT INTO Submissions (AssignmentID, StudentID, FileName, FileContent, Status)
-VALUES (101, 2, 'lab1_logic.cpp', CAST('int main() { return 0; }' AS VARBINARY(MAX)), 'On-Time');
+VALUES ( 6, 2, 'lab1_logic.cpp', CAST('int main() { return 0; }' AS VARBINARY(MAX)), 'On-Time');
 
-INSERT INTO Submissions (AssignmentID, StudentID, FileName, FileContent, Status)
-VALUES (101, 3, 'lab1_final.cpp', CAST('int main() { return 0; }' AS VARBINARY(MAX)), 'On-Time');
+INSERT INTO Submissions ( AssignmentID, StudentID, FileName, FileContent, Status)
+VALUES (6, 3, 'lab1_final.cpp', CAST('int main() { return 0; }' AS VARBINARY(MAX)), 'On-Time');
 
 INSERT INTO MatchResults (TargetSubmissionID, SourceSubmissionID, SimilarityPercentage)
 VALUES (2, 1, 95.50);
 
 Select * from Submissions
 select * from MatchResults
+
+
 
 CREATE TABLE StudentProfiles (
     UserID INT PRIMARY KEY NOT NULL,
