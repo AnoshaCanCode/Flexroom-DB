@@ -1,6 +1,11 @@
-USE FlexroomDB;
-GO
+# Flexroom Project Context
+## Tech Stack:
+- Frontend: React.js (with Tailwind/Bootstrap)
+- Backend: Node.js (Express)
+- Database: SQL Server (mssql package)
 
+## Key SQL Schemas:
+''' sql
 CREATE TABLE Users (
     UserID INT PRIMARY KEY IDENTITY(1,1) NOT NULL,
     Name NVARCHAR(255) NOT NULL,
@@ -8,23 +13,10 @@ CREATE TABLE Users (
     Password NVARCHAR(100) check(LEN(Password)>=8),
     UserRole NVARCHAR(20) NOT NULL check(UserRole IN ('student','evaluator')),
     CreatedAt DATETIME DEFAULT GETDATE()
-);
-GO
+);   
+-- where Password: hashed
 
-INSERT INTO Users (Name, Email, Password, UserRole)
-VALUES 
-('Anosha Asher', 'anoshaasher@gmail.com', 'TeamLead2026!', 'evaluator'),
-('Muhammad Ibrahim', 'mibrahim@gmail.com', 'LogicPass123', 'student'),
-('Amal Fazeel', 'amalfazeel@gmail.com', 'AmalSecure456', 'student'),
-('Dr. Smith', 'dr.smith@gmail.com', 'ProfessorPass!', 'evaluator'),
-('John Doe', 'johndoe.test@gmail.com', 'StudentPass789', 'student');
-
-SELECT * FROM Users;
-
-
-    USE FlexroomDB;
-GO
-    create TABLE Submissions (
+create TABLE Submissions (
     SubmissionID INT PRIMARY KEY IDENTITY(1,1) NOT NULL,
     AssignmentID INT NOT NULL, 
     StudentID INT NOT NULL,    -- Foreign Key to Users table
@@ -35,10 +27,8 @@ GO
     
     FOREIGN KEY (StudentID) REFERENCES Users(UserID) ON DELETE CASCADE,
     Foreign Key (AssignmentID) References Assessment(assessmentID) on delete cascade
-);
 
-
-CREATE TABLE MatchResults (
+ CREATE TABLE MatchResults (
     MatchID INT PRIMARY KEY IDENTITY(1,1) NOT NULL,
     TargetSubmissionID INT NOT NULL, -- The file being checked
     SourceSubmissionID INT NOT NULL, -- The file it is being compared against
@@ -51,20 +41,6 @@ CREATE TABLE MatchResults (
     CONSTRAINT FK_Match_Source FOREIGN KEY (SourceSubmissionID) 
         REFERENCES Submissions(SubmissionID)
 );
-
-INSERT INTO Submissions (AssignmentID, StudentID, FileName, FileContent, Status)
-VALUES ( 6, 2, 'lab1_logic.cpp', CAST('int main() { return 0; }' AS VARBINARY(MAX)), 'On-Time');
-
-INSERT INTO Submissions ( AssignmentID, StudentID, FileName, FileContent, Status)
-VALUES (6, 3, 'lab1_final.cpp', CAST('int main() { return 0; }' AS VARBINARY(MAX)), 'On-Time');
-
-INSERT INTO MatchResults (TargetSubmissionID, SourceSubmissionID, SimilarityPercentage)
-VALUES (2, 1, 95.50);
-
-Select * from Submissions
-select * from MatchResults
-
-
 
 CREATE TABLE StudentProfiles (
     UserID INT PRIMARY KEY NOT NULL,
@@ -79,21 +55,6 @@ CREATE TABLE EvaluatorProfiles (
     EvalClassNum INT DEFAULT 0, --number of classes evaluated
     Foreign Key (UserID) REFERENCES Users
 );
-GO
-
-INSERT INTO StudentProfiles (UserID, EducationLevel, EducationYear) 
-VALUES 
-(2, 'graduate', 2),
-(3, 'graduate', 3),
-(5, 'graduate', 1);
-
-INSERT INTO EvaluatorProfiles (UserID) 
-VALUES 
-(1),
-(4);
-
-SELECT * FROM StudentProfiles;
-SELECT * FROM EvaluatorProfiles;
 
 CREATE TABLE Course (
     courseID INT PRIMARY KEY,
@@ -101,7 +62,7 @@ CREATE TABLE Course (
     courseCode INT NOT NULL UNIQUE,
     generatedDate NVARCHAR(20) NOT NULL,
     numClasses INT DEFAULT 0
-);
+); 
 
 CREATE TABLE CourseClass (
     classID INT PRIMARY KEY,
@@ -111,6 +72,11 @@ CREATE TABLE CourseClass (
     generatedDate NVARCHAR(20) NOT NULL,
     numStudents INT DEFAULT 0
 );
+
+--to understand differnece between Course and CourseClass: e.g. 
+--Course: Physics
+--CourseClass: Physics BSCS 4D, Physics BSCS 4E (different 
+--section classes of same course) 
 
 CREATE TABLE Assessment (
     assessmentID INT PRIMARY KEY,
@@ -123,32 +89,15 @@ CREATE TABLE Assessment (
     dueDate NVARCHAR(20) NULL,
     status NVARCHAR(20) DEFAULT 'unmarked'
 );
+'''
 
-INSERT INTO Course (courseID, courseName, courseCode, generatedDate, numClasses)
-VALUES
-    (1, 'Object Oriented Programming', 301, '2025-01-08', 2),
-    (2, 'Database Systems', 351, '2025-01-08', 1),
-    (3, 'Software Engineering', 471, '2025-08-10', 1),
-    (4, 'Data Structures', 201, '2025-08-10', 1);
+## Core Logic:
+- Authentication: JWT-based login/register
+- Plagiarism: Comparing current StudentID file for which plagiarism detection is called, with all the submitted files in database
 
-INSERT INTO CourseClass (classID, courseID, className, classCode, generatedDate, numStudents)
-VALUES
-    (1, 1, 'OOP-A', 3011, '2025-01-10', 35),
-    (2, 1, 'OOP-B', 3012, '2025-01-10', 30),
-    (3, 2, 'DB-A', 3511, '2025-01-12', 40),
-    (4, 3, 'SE-A', 4711, '2025-08-15', 38),
-    (5, 4, 'DS-A', 2011, '2025-08-15', 42);
-
-INSERT INTO Assessment
-    (assessmentID, classID, title, type, marks, uploadingDate, dueDate, status)
-VALUES
-    (1, 1, 'Lab 1 – Inheritance Report', 'document', 10, '2025-02-20', '2025-03-10', 'marked'),
-    (2, 1, 'Assignment 2 – Linked List', 'code', 20, '2025-03-01', '2025-03-20', 'unmarked'),
-    (3, 3, 'Quiz 1 – ER Diagrams', 'bubble', 5, '2025-02-25', '2025-02-28', 'marked'),
-    (4, 4, 'Assignment 1 – SRS Document', 'document', 25, '2025-03-20', '2025-04-05', 'unmarked'),
-    (5, 5, 'Lab 3 – BST Implementation', 'code', 15, '2025-09-01', NULL, 'unmarked'),
-    (6, 5, 'Mid Exam – Data Structures', 'document', 50, '2025-10-01', '2025-10-15', 'unmarked');
-
-    SELECT * FROM Course;
-    SELECT * FROM CourseClass;
-    SELECT * FROM Assessment;
+## Business Rules:
+- Passwords must be at least 8 characters.
+- Students can only see their own submissions.
+- Evaluators can see all submissions and plagiarism results.
+- File uploads are stored as binary in SQL.
+- Frontend must send JSON objects with keys matching SQL column names.
