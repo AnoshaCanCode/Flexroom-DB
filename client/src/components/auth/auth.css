@@ -1,0 +1,158 @@
+/* use our figma color code, make it a clean gradient */
+/* 1. BACKGROUND (LINEAR GRADIENT) & FONT (Global) */
+.auth-background {
+    /* Vertical gradient: Top (#8D9765) to Bottom (#6A714B) */
+    background: linear-gradient(180deg, #8D9765 0%, #6A714B 100%);
+    min-height: 100vh;
+    /* Apply font here so it cascades to all text below */
+    font-family: 'Georgia', serif; 
+}
+
+/* FORM CONTAINER */
+.auth-form {
+    width: 100%;
+    max-width: 450px;
+    background: transparent; /* removes the grey box */
+    border: none;
+    box-shadow: none;
+}
+
+/* Container to hold both input and icon */
+.input-container {
+    position: relative;
+    width: 100%;
+}
+
+/* Position the icon on the RHS */
+.input-icon {
+    position: absolute;
+    right: 20px; /* Adjusts distance from the right edge */
+    top: 50%;
+    transform: translateY(-50%); /* Perfectly centers it vertically */
+    color: #AAB18B; /* Matches text color */
+    pointer-events: none; /* Allows clicks to pass through to the input */
+    font-size: 1.2rem;
+}
+
+/* Ensure there is enough padding on the right side of the input 
+   so text doesn't overlap the icon */
+.auth-input {
+    padding-right: 50px !important; /* Space for the icon */
+}
+
+/* INPUT SPECIFIC STYLING */
+.auth-input {
+    background-color: #6A714B !important; 
+    color: #AAB18B !important;
+
+    display: block;
+    width: 100%;
+
+    padding: 15px 20px;
+    border-radius: 50px;
+    margin-bottom: 15px;
+
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.auth-input::placeholder { 
+    color: #AAB18B !important; 
+    opacity: 0.8; 
+} 
+
+/* to kill the white glow when you actually click to type */
+.auth-input:focus {
+    box-shadow: none !important; 
+    outline: none !important;
+    border: none !important;
+}
+
+/* BUTTON SPECIFIC STYLING */
+.btn-auth {
+    background-color: #6A714B !important;  
+    color: #313103 !important; 
+    padding: 15px 20px;
+    border-radius: 50px;
+    font-weight: 600;
+    width: auto; 
+    min-width: 220px;
+    white-space: nowrap;
+    
+    /* TO CENTER ALIGN IT: */
+    display: block;    /* Makes the button behave like a container */
+    margin: 10px auto; /* 'auto' tells the browser to push equal space to both sides */
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.btn-auth:hover { 
+    background-color: #555b3d !important; /* Slightly darker shade on hover */
+    cursor: pointer;
+}
+
+/* 4. HEADINGS & TEXT */
+.login-heading {
+    font-size: 3.5rem;
+    color: #313103;
+    margin-bottom: 2rem;
+    font-weight: 550; /* bold */
+    text-align: center;
+}
+
+.forgot-password {
+    color: #313103;
+    text-decoration: none;
+    font-size: 0.9rem;
+    display: block;
+    margin-bottom: 1rem;
+    text-align: left;
+}
+
+/* 5. LOGO IMAGE */
+.auth-logo-img {
+    max-width: 150px;
+    height: auto;
+    display: block;
+    margin: 2rem auto 0 auto;
+}
+
+/* --- VERTICAL SPACING ADJUSTMENTS --- */
+
+/* 1. Push the 'Login' title down slightly so it's not hugging the top */
+.auth-form {
+    padding-top: 40px !important; 
+}
+
+/* 2. Tighten space below 'Login' heading */
+.login-heading {
+    margin-bottom: 1.5rem !important;
+}
+
+/* 3. Tighten space below 'Forgot Password' */
+.auth-form .text-start {
+    margin-bottom: 1.5rem !important; 
+}
+
+/* 4. Tighten space below the buttons */
+.auth-form .d-grid {
+    margin-bottom: 1.5rem !important; 
+}
+
+/* added for signup */
+/* Back Arrow Style */
+.back-arrow-extreme {
+    position: absolute; /* Breaks it out of the center flow */
+    top: 30px;          /* Distance from top */
+    left: 30px;         /* Distance from the extreme left */
+    font-size: 2rem;
+    color: #313103;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    z-index: 10;        /* Ensures it sits on top of everything */
+}
+
+.back-arrow-extreme:hover {
+    transform: scale(1.1);
+}
