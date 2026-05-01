@@ -1,0 +1,168 @@
+.progress-page {
+  min-height: 100vh;
+  width: 100%;
+  background: #d8d8d8;
+  padding: 20px;
+  color: #1f2614;
+}
+
+.progress-shell {
+  width: 100%;
+  max-width: 980px;
+  margin: 0 auto;
+  overflow: hidden;
+  border: 1px solid #80866a;
+  background: #efefec;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.12);
+}
+
+.progress-topbar {
+  height: 48px;
+  background: #6a7351;
+  color: #f2f1e8;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.menu-toggle-btn {
+  border: none;
+  border-radius: 4px;
+  padding: 4px;
+  background: transparent;
+  color: inherit;
+}
+
+.menu-toggle-btn:hover {
+  background: #4f563d;
+}
+
+.brand-text {
+  font-size: 27px;
+  font-weight: 600;
+  font-style: italic;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+.hello-text {
+  font-size: 14px;
+}
+
+.icon-md {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 auto;
+}
+
+.icon-sm {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 auto;
+}
+
+.content-row {
+  display: flex;
+  min-height: 520px;
+}
+
+.sidebar-panel {
+  width: 126px;
+  background: #e6e6e6;
+  border-right: 1px solid #c8c9bd;
+  color: #303530;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 16px 12px;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.sidebar-link {
+  border: none;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-align: left;
+  font-size: 12px;
+  color: inherit;
+  padding: 0;
+}
+
+.sidebar-footer-links {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 12px;
+}
+
+.sidebar-text-btn {
+  border: none;
+  background: transparent;
+  text-align: left;
+  color: inherit;
+  padding: 0;
+}
+
+.fr-pill {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px solid #93998a;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+}
+
+.main-panel {
+  flex: 1;
+}
+
+.subject-strip {
+  height: 44px;
+  border-bottom: 1px solid #d3d4c8;
+  background: #d4d8c3;
+  padding: 8px 16px 0;
+}
+
+.subject-title {
+  margin: 0;
+  color: #2d3521;
+  font-size: 25px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.chart-section {
+  padding: 16px 12px 0;
+}
+
+.chart-axis-label {
+  margin: 0 0 4px;
+  color: #2b3320;
+  font-size: 10px;
+}
+
+.chart-wrapper {
+  width: 100%;
+  height: 345px;
+}
+
+.marked-summary {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0 12px 16px 0;
+  text-align: right;
+  font-size: 9px;
+  line-height: 1.2;
+  color: #3b4130;
+}
