@@ -1,32 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Login from './components/auth/Login'; 
+import Signup from './components/auth/Signup'; 
 
 function App() {
-// Inside your App function
-const [messages, setMessages] = useState({ backendMsg: "", sqlMsg: "" });
-
-useEffect(() => {
-    fetch('/api/message')
-      .then(res => res.json())
-      .then(data => {
-          setMessages(data); // Stores the whole object {backendMsg, sqlMsg}
-      })
-      .catch(err => console.log(err));
-}, []);
-
-return (
-    <div className="App">
-        <header className="App-header">
-            <img src={logo} className="App-logo" alt="logo" />
-            
-            {/* Displaying both messages */}
-            <h2>{messages.backendMsg}</h2>
-            <p style={{ color: '#61dafb' }}>{messages.sqlMsg}</p>
-            
-        </header>
-    </div>
-);
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+      </Routes>
+    </Router>
+  );
 }
 
 export default App;
