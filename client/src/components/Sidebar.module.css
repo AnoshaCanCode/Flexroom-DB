@@ -1,0 +1,72 @@
+.sidebar {
+    height: 100vh;
+    width: 220px; 
+    display: flex;
+    flex-direction: column; /* Stacks top and bottom sections */
+    background-color: #dfdfdf;
+    padding: 20px 0; /* Vertical padding */
+    transition: width 0.3s ease; /* Smooth animation */
+    border-right: 1px solid #ddd;
+    overflow: hidden; /* Keeps things tidy when closing */
+}
+
+/*  the class applied when isOpen is false */
+.closed {
+    width: 80px; /* Narrow width */
+}
+
+.topSection {
+    flex: 1; /* This pushes the bottomSection to the bottom */
+}
+
+.bottomSection {
+    border-top: 1px solid #ddd;
+    padding-top: 10px;
+    padding-bottom: 40px; /* Adds space at the very bottom of the sidebar */
+    display: flex;
+    flex-direction: column; /* Ensures Logout and Logo stack nicely */
+}
+
+.logoContainer {
+    margin-top: 0; /* reduce this number to move the logo up, increase to move it down */
+    display: flex;
+    justify-content: left;
+    align-items: left;
+    padding: 15px;
+    background-color: #dfdfdf; 
+    border-top: 1px solid #ddd;
+    flex-shrink: 0; /* to prevent the logo from getting squashed */
+}
+
+.logo {
+    width: 40px; 
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    /* this filter adds a dark outline/shadow effect */
+    filter: drop-shadow(0px 0px 2px rgba(0,0,0,0.3)); 
+}
+
+.navMenu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.navItem {
+    display: flex;
+    align-items: center; /* Centers icon and text vertically */
+    padding: 12px 20px;
+    cursor: pointer;
+    /*transition: background 0.2s;*/
+    white-space: nowrap; /* Keeps text on one line */
+}
+
+.navItem:hover {
+    background-color: #d1d1d1;
+}
+
+.icon {
+    font-size: 20px;
+    min-width: 30px; /* Ensures space for icon even if collapsed */
+}

@@ -1,0 +1,60 @@
+.card {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border: 1px solid #e1e1e1;
+    width: 280px; /* Changed from 250px to 280px */
+    height: 250px;
+}
+
+/* The Top Section */
+.cardHeader {
+    color: white;
+    padding: 15px 20px;
+    height: 40%;
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Added this to center text horizontally */
+    text-align: center;      /* Added for safety if text wraps */
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.1);
+}
+
+.cardHeader h3 {
+    margin: 0;
+    font-size: 1rem; /* Slightly smaller to fit */
+    font-weight: 600;
+}
+
+/* The Grey Bottom Section */
+.cardBody {
+    background-color: #f8f9fa; /* Light grey base */
+    padding: 15px 20px;
+    flex-grow: 1; /* Occupy the remaining space */
+    display: flex;
+    flex-direction: column; /* Stack icon and text vertically */
+    align-items: center; /* Center horizontally */
+    justify-content: center; /* Center vertically */
+    gap: 10px;
+    border-top: 1px solid #e1e1e1;
+}
+
+.iconWrapper {
+    font-size: 40px; /* Large, noticeable icons */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cardBody p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #666; /* Subtitle color */
+}

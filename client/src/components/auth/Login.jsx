@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './auth.css'; 
 
-import LogoImage from './Flexroom-white.png'; //logo image name
+import LogoImage from '../assets/Flexroom-white.png';
 // Import icons
 import { useNavigate } from 'react-router-dom'; // Add for back arrow
 import { FaArrowLeft, FaEnvelope, FaLock } from 'react-icons/fa'; 

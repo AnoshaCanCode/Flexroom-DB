@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom'; 
 import { FaUser, FaLock, FaArrowLeft, FaEnvelope } from 'react-icons/fa';
 import './auth.css';
-import LogoImage from './Flexroom-white.png';
+import LogoImage from '../assets/Flexroom-white.png';
 
 const Signup = () => {
     const navigate = useNavigate();
