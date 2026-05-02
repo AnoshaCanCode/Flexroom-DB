@@ -1,0 +1,33 @@
+.topbar {
+    height: 70px;
+    background-color: #6a714b; /* brand color */
+    color: white;
+    display: flex;
+    justify-content: space-between; /* This pushes Left to the left, Right to the right */
+    align-items: center;
+    padding: 0 20px;
+}
+
+.greeting {
+    font-size: 1.2rem; /* Make the text bigger */
+    font-weight: 400;  /*  make it bold */
+    margin-right: 5px; /* Space between text and icon */
+}
+
+.leftSection, .rightSection {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Adds space between menu/logo and user info */
+}
+
+.menuButton {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+}
+
+.logo {
+    height: 45px; /* Adjust size to fit header */
+    width: auto;
+}

@@ -55,6 +55,9 @@ function ScaledFrame({ children }) {
     </div>
   );
 }
+import DashboardLayout from './components/DashboardLayout';
+import StudentDashboard from './pages/StudentDashboard';
+import EvaluatorDashboard from './pages/EvaluatorDashboard';
 
 function App() {
   return (
@@ -71,6 +74,15 @@ function App() {
           path="/flexroom/evaluator"
           element={<ScaledFrame><EvaluatorPage /></ScaledFrame>}
         />
+        {/* Student Route with Layout */}
+        <Route path="/student" element={<DashboardLayout userRole="student" />}>
+          <Route index element={<StudentDashboard />} />
+        </Route>
+
+        {/* Evaluator Route with Layout */}
+        <Route path="/evaluator" element={<DashboardLayout userRole="evaluator" />}>
+          <Route index element={<EvaluatorDashboard />} />
+        </Route>
       </Routes>
     </Router>
   );

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './auth.css'; 
 
-import LogoImage from './Flexroom-white.png'; //logo image name
+import LogoImage from '../assets/Flexroom-white.png';
 // Import icons
 import { useNavigate } from 'react-router-dom'; // Add for back arrow
 import { FaArrowLeft, FaEnvelope, FaLock } from 'react-icons/fa'; 
@@ -82,6 +82,13 @@ const Login = () => {
                 {/* (Forgot Password link) */}
                 <div className="text-start mb-5">
                     <button type="button" className="forgot-password bg-transparent border-0 p-0">Forgot Password?</button>
+
+                    <button
+                        type="button"
+                        className="forgot-password p-0 border-0 bg-transparent"
+                    >
+                        Forgot Password?
+                    </button>
                 </div>
 
                 {/* 3. The Role/Submit Buttons */}

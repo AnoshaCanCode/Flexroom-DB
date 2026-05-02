@@ -10,6 +10,8 @@ import {
   YAxis,
 } from "recharts";
 import "./ProgressGraph.css";
+import Topbar from "./Topbar";
+import Sidebar from "./Sidebar";
 
 const users = [
   {
@@ -25,6 +27,7 @@ const courseClass = {
   classID: 601,
   courseID: 100,
   className: "Operating Systems",
+  sectionLabel: "BSCS-4J",
   classCode: 4015,
   generatedDate: "2026-01-01",
   numStudents: 80,
@@ -153,42 +156,6 @@ const graphLinePalette = {
   classMax: "#2E6B3A",
 };
 
-function IconHome({ className = "" }) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="M3 10.5L12 3l9 7.5" />
-      <path d="M5 9.8V21h14V9.8" />
-    </svg>
-  );
-}
-
-function IconCalendar({ className = "" }) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="2">
-      <rect x="3" y="5" width="18" height="16" rx="2" />
-      <path d="M8 3v4M16 3v4M3 10h18" />
-    </svg>
-  );
-}
-
-function IconMenu({ className = "" }) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="M4 7h16M4 12h16M4 17h16" />
-    </svg>
-  );
-}
-
-function IconUserCircle({ className = "" }) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="2">
-      <circle cx="12" cy="8" r="3.5" />
-      <path d="M4.5 20c1.7-3.3 4.4-5 7.5-5s5.8 1.7 7.5 5" />
-      <circle cx="12" cy="12" r="10" />
-    </svg>
-  );
-}
-
 function ProgressGraph() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -222,56 +189,15 @@ function ProgressGraph() {
   return (
     <div className="progress-page">
       <div className="progress-shell">
-        <header className="progress-topbar">
-          <div className="d-flex align-items-center gap-2">
-            <button
-              type="button"
-              onClick={() => setIsSidebarOpen((prev) => !prev)}
-              aria-label="Toggle side panel"
-              className="menu-toggle-btn"
-            >
-              <IconMenu className="icon-md" />
-            </button>
-            <p className="brand-text">FlexRoom.</p>
-          </div>
-
-          <div className="d-flex align-items-center gap-2">
-            <span className="hello-text">Hi {users[0].Name}!</span>
-            <IconUserCircle className="icon-md" />
-          </div>
-        </header>
+        <Topbar userName={users[0].Name} toggleSidebar={() => setIsSidebarOpen((prev) => !prev)} />
 
         <div className="content-row">
-          {isSidebarOpen && (
-            <aside className="sidebar-panel">
-              <nav className="sidebar-nav">
-                <button type="button" className="sidebar-link">
-                  <IconHome className="icon-sm" />
-                  <span>Home</span>
-                </button>
-                <button type="button" className="sidebar-link">
-                  <IconCalendar className="icon-sm" />
-                  <span>Calendar</span>
-                </button>
-              </nav>
-
-              <div className="sidebar-footer-links">
-                <button type="button" className="sidebar-text-btn">
-                  Settings
-                </button>
-                <button type="button" className="sidebar-text-btn">
-                  Logout
-                </button>
-                <div className="fr-pill">
-                  FR
-                </div>
-              </div>
-            </aside>
-          )}
+          <Sidebar isOpen={isSidebarOpen} userRole={users[0].UserRole} />
 
           <main className="main-panel">
             <div className="subject-strip">
               <h1 className="subject-title">{courseClass.className}</h1>
+              <p className="subject-subtitle">{courseClass.sectionLabel}</p>
             </div>
 
             <section className="chart-section">
