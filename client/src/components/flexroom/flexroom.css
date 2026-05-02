@@ -1,123 +1,64 @@
+/* RESET: Prevents layout math errors */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
 .fr-shell {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden; /* Prevents the whole browser from scrolling */
+  background-color: #f8f9fa;
   position: relative;
-  width: 1440px;
-  height: 1024px;
-  margin: 0 auto;
-  overflow: hidden;
-  background: #f2f2f2;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
 }
-.fr-topbar {
-  position: absolute;
-  inset: 0 0 auto 0;
-  height: 56px;
-  background: #6b705c;
-  color: #fff;
-  z-index: 20;
-}
-.fr-sidebar {
-  position: absolute;
+
+/* SIDEBAR CONTAINER */
+.fr-sidebar-container {
+  height: 100vh;
+  width: 220px;
+  position: fixed;
   left: 0;
   top: 0;
-  width: 220px;
-  height: 1024px;
-  padding-top: 80px;
-  background: #f6f6f4;
-  border-right: 1px solid #d6d9d0;
-  z-index: 10;
-  transition: transform 0.2s ease-out;
+  z-index: 1000;
+  transition: transform 0.3s ease-in-out;
+  background-color: #fff;
 }
-.fr-main {
-  position: absolute;
-  top: 56px;
-  height: 968px;
-  overflow-y: auto;
-  overflow-x: hidden;
-  background: #f2f2f2;
-}
-.fr-main-open {
-  left: 220px;
-  width: 1220px;
-}
-.fr-main-closed {
-  left: 0;
-  width: 1440px;
-}
-.fr-nav-btn {
-  width: 100%;
-  border: 0;
-  background: transparent;
-  text-align: left;
-}
-.fr-nav-link,
-.fr-nav-btn {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 12px;
-  color: #3d4038;
-  border-radius: 10px;
-  text-decoration: none;
-}
-.fr-nav-link:hover,
-.fr-nav-btn:hover {
-  background: #e5e8df;
-  color: #3d4038;
-}
-.fr-course-banner {
-  background: #bcc3b0;
-  border-bottom: 1px solid rgba(168, 176, 150, 0.4);
-  padding: 12px 32px;
-}
-.fr-page-pad { padding: 24px 32px 32px; }
-.fr-card {
-  background: #fff;
-  border-radius: 16px;
-  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
-}
-.fr-muted { color: #6b6f64; }
-.fr-green-btn {
-  background: #7d8b63;
-  color: #fff;
-  border: 0;
-}
-.fr-green-btn:hover { background: #6f7d56; color: #fff; }
-.fr-drop {
-  min-height: 120px;
-  border: 2px dashed #b8beb0;
-  background: #e8eae4;
-  border-radius: 10px;
-}
-.fr-drop.drag { border-color: #7d8b63; background: #dfe5d8; }
-.fr-rubric-head {
-  background: #7d8b63;
-  color: #fff;
-  text-align: center;
-  padding: 10px;
-  font-weight: 600;
-}
-.fr-modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.4);
-  z-index: 9999;
-}
-.fr-main::-webkit-scrollbar { width: 6px; }
-.fr-main::-webkit-scrollbar-thumb { background: #bcc3b0; border-radius: 999px; }
 
-/* Evaluator table must always fit available width */
-.fr-eval-table-wrap {
+.fr-sidebar-container.closed {
+  transform: translateX(-220px);
+}
+
+/* VIEWPORT (Topbar + Content) */
+.fr-viewport {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw; /* Covers full width */
+  transition: padding-left 0.3s ease-in-out;
+}
+
+/* When sidebar is open, we push the view, but width remains 100vw */
+.fr-viewport.shifted {
+  padding-left: 220px; 
+}
+
+.fr-viewport.full {
+  padding-left: 0;
+}
+
+/* MAIN CONTENT AREA */
+.fr-content-area {
+  flex: 1;
+  overflow-y: auto; /* Only this area scrolls vertically */
+  padding: 40px;
   width: 100%;
-  overflow-x: hidden;
+  background-color: #ffffff;
 }
-.fr-eval-table {
-  width: 100% !important;
-  table-layout: fixed;
-  font-size: 14px;
-}
-.fr-eval-table th,
-.fr-eval-table td {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+
+/* Optional: Ensure your Topbar doesn't overflow */
+header {
+  width: 100%;
+  flex-shrink: 0;
 }

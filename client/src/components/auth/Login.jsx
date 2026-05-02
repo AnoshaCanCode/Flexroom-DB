@@ -83,12 +83,6 @@ const Login = () => {
                 <div className="text-start mb-5">
                     <button type="button" className="forgot-password bg-transparent border-0 p-0">Forgot Password?</button>
 
-                    <button
-                        type="button"
-                        className="forgot-password p-0 border-0 bg-transparent"
-                    >
-                        Forgot Password?
-                    </button>
                 </div>
 
                 {/* 3. The Role/Submit Buttons */}
