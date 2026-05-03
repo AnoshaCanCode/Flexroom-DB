@@ -1,20 +1,15 @@
 /**
- * FlexRoom — Assessment & Grading API (Postman-friendly, multipart uploads).
+ * FlexRoom — Assessment & Grading API (SQL Persistence Version).
  * Autograding (TestCase) and plagiarism (MatchResults) are intentionally separate.
  */
 const express = require('express');
 const multer = require('multer');
+const sql = require('mssql'); // Added this so sql.Int/sql.NVarChar works
 const { AssessmentFactory } = require('../server/assessment/AssessmentFactory');
 const { Rubric } = require('../server/rubric/Rubric');
 const { TestCase } = require('../server/testCase/TestCase');
 const { SolutionKey } = require('../server/solutionKey/SolutionKey');
 const { MatchResults } = require('../server/plagiarism/MatchResults');
-const {
-  assessments,
-  submissions,
-  createAssessmentId,
-  createSubmissionId,
-} = require('../server/grading/GradingRegistry');
 const { ConnectionManager } = require('../server/singleton/ConnectionManager');
 const { StudentDashboardObserver, globalAutogradeSubject } = require('../server/observer/DashboardNotifier');
 
@@ -50,142 +45,108 @@ router.get('/health', (req, res) => {
   });
 });
 
-/** Factory: create Document | Code assessment */
-router.post('/assessments', express.json(), (req, res) => {
+/** 1. Create Assessment (Saves to SQL) */
+router.post('/assessments', express.json(), async (req, res) => {
   try {
-    const { type, title, marks, dueDate, classId, uploadingDate, status } = req.body;
-    if (!type || !title || marks == null) {
-      return res.status(400).json({ error: 'type, title, and marks are required.' });
-    }
-    const id = createAssessmentId();
-    const assessment = AssessmentFactory.create(type, {
-      id,
-      title,
-      marks: Number(marks),
-      dueDate: dueDate || null,
-      classId,
-      uploadingDate,
-      status,
-    });
-    assessments.set(id, assessment);
-    return res.status(201).json(assessment.getAssessmentDetails());
+    const { type, title, marks, dueDate, classId } = req.body;
+    const pool = await ConnectionManager.getInstance().getPool();
+    
+    const result = await pool.request()
+      .input('classID', sql.Int, classId)
+      .input('title', sql.NVarChar, title)
+      .input('type', sql.NVarChar, type)
+      .input('marks', sql.Int, marks)
+      .input('dueDate', sql.NVarChar, dueDate || null)
+      .query(`
+        INSERT INTO Assessment (classID, title, type, marks, uploadingDate, dueDate, status)
+        OUTPUT INSERTED.assessmentID
+        VALUES (@classID, @title, @type, @marks, CONVERT(NVARCHAR(20), GETDATE(), 23), @dueDate, 'unmarked')
+      `);
+
+    const newId = result.recordset[0].assessmentID;
+    return res.status(201).json({ assessmentID: newId, title, message: "Saved to Database" });
   } catch (err) {
-    return res.status(400).json({ error: err.message });
+    return res.status(500).json({ error: err.message });
   }
 });
 
-router.get('/assessments/:id', (req, res) => {
-  const a = assessments.get(req.params.id);
-  if (!a) return res.status(404).json({ error: 'Assessment not found.' });
-  return res.json({
-    ...a.getAssessmentDetails(),
-    submissionOpen: a.isSubmissionOpen(),
-  });
+/** 2. Get Assessment Details (From SQL) */
+router.get('/assessments/:id', async (req, res) => {
+  try {
+    const pool = await ConnectionManager.getInstance().getPool();
+    const result = await pool.request()
+      .input('id', sql.Int, req.params.id)
+      .query('SELECT * FROM Assessment WHERE assessmentID = @id');
+
+    if (result.recordset.length === 0) return res.status(404).json({ error: 'Assessment not found.' });
+    
+    const row = result.recordset[0];
+    // Re-wrap in Factory object to keep pattern logic (isSubmissionOpen, etc)
+    const a = AssessmentFactory.create(row.type, row);
+    
+    return res.json({
+      ...a.getAssessmentDetails(),
+      status: row.status
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-/** Composite rubric */
-router.post('/assessments/:id/rubric', express.json(), (req, res) => {
-  const a = assessments.get(req.params.id);
-  if (!a) return res.status(404).json({ error: 'Assessment not found.' });
+/** 3. Student upload submission (Saves to SQL VARBINARY) */
+router.post('/submissions', upload.single('file'), async (req, res) => {
+  try {
+    const { assessmentId, studentId, type } = req.body;
+    if (!assessmentId || !studentId || !type || !req.file) {
+      return res.status(400).json({ error: 'assessmentId, studentId, type, and file are required.' });
+    }
 
-  const rubric = new Rubric();
-  const criteria = req.body.criteria || [];
-  for (const c of criteria) {
-    rubric.addCriterion(String(c.heading), Number(c.points), c.sectionHeading || null);
+    const pool = await ConnectionManager.getInstance().getPool();
+    const result = await pool.request()
+      .input('aid', sql.Int, assessmentId)
+      .input('sid', sql.Int, studentId)
+      .input('filename', sql.NVarChar, req.file.originalname)
+      .input('content', sql.VarBinary(sql.MAX), req.file.buffer)
+      .query(`
+        INSERT INTO Submissions (AssignmentID, StudentID, FileName, FileContent, SubmissionDate, Status)
+        OUTPUT INSERTED.SubmissionID
+        VALUES (@aid, @sid, @filename, @content, GETDATE(), 'On-Time')
+      `);
+
+    return res.status(201).json({ submissionId: result.recordset[0].SubmissionID });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
-  a.linkRubric(rubric);
-  return res.json({ ok: true, markingScheme: rubric.getMarkingScheme(), studentView: rubric.getStudentView() });
 });
 
-/** Test cases (autograde) */
-router.post('/assessments/:id/test-cases', express.json(), (req, res) => {
-  const a = assessments.get(req.params.id);
-  if (!a) return res.status(404).json({ error: 'Assessment not found.' });
-  if (a.type !== 'code') {
-    return res.status(400).json({ error: 'Test cases apply to code assessments only.' });
-  }
-
-  const testCase = new TestCase({
-    assessmentId: req.params.id,
-    getAssessmentStatus: () => assessments.get(req.params.id)?.status || 'unmarked',
-  });
-  const tests = req.body.tests || [];
-  for (const t of tests) {
-    testCase.addTest(String(t.input ?? ''), String(t.expectedOutput ?? ''));
-  }
-  a.linkTestCases(testCase);
-  return res.json({ ok: true, testsConfigured: testCase.tests.length });
-});
-
-/** Solution key (multipart: file + fields) */
-router.post('/assessments/:id/solution-key', upload.single('file'), (req, res) => {
-  const a = assessments.get(req.params.id);
-  if (!a) return res.status(404).json({ error: 'Assessment not found.' });
-  if (!req.file) return res.status(400).json({ error: 'file is required (form-data).' });
-
-  const key = new SolutionKey({
-    fileName: req.file.originalname,
-    buffer: req.file.buffer,
-    mimeType: req.file.mimetype,
-  });
-  if (req.body.releaseDate) {
-    key.setReleaseDate(req.body.releaseDate);
-  }
-  a.attachSolutionKey(key);
-  return res.json({ ok: true, state: key.getStateName(), releaseDate: key.releaseDate });
-});
-
-/** Evaluator: mark assessment complete (unlocks student-visible tests policy) */
-router.patch('/assessments/:id/status', express.json(), (req, res) => {
-  const a = assessments.get(req.params.id);
-  if (!a) return res.status(404).json({ error: 'Assessment not found.' });
-  a.setStatus(req.body.status || 'marked');
-  return res.json({ ok: true, status: a.status });
-});
-
-/** Student upload submission (PDF or CPP) */
-router.post('/submissions', upload.single('file'), (req, res) => {
-  const { assessmentId, studentId, type } = req.body;
-  if (!assessmentId || !studentId || !type || !req.file) {
-    return res.status(400).json({ error: 'assessmentId, studentId, type, and file are required.' });
-  }
-  if (type !== 'document' && type !== 'code') {
-    return res.status(400).json({ error: "type must be 'document' or 'code'." });
-  }
-
-  const id = createSubmissionId();
-  submissions.set(id, {
-    id,
-    assessmentId,
-    studentId: String(studentId),
-    type,
-    fileName: req.file.originalname,
-    buffer: req.file.buffer,
-  });
-  return res.status(201).json({ submissionId: id });
-});
-
-/** Evaluator-triggered autograde (separate from plagiarism) */
+/** 4. Evaluator-triggered autograde (SQL + Local g++) */
 router.post('/autograde', upload.single('file'), async (req, res) => {
   try {
     const { assessmentId, studentId } = req.body;
     if (!assessmentId || !studentId || !req.file) {
       return res.status(400).json({ error: 'assessmentId, studentId, and file are required.' });
     }
-    const assessment = assessments.get(assessmentId);
-    if (!assessment) return res.status(404).json({ error: 'Assessment not found.' });
-    if (assessment.type !== 'code') {
-      return res.status(400).json({ error: 'Autograde applies to code assessments only.' });
-    }
-    if (!assessment.testCase) {
-      return res.status(400).json({ error: 'No test cases linked. POST /assessments/:id/test-cases first.' });
-    }
 
-    const summary = await assessment.testCase.execute(
-      req.file.buffer,
-      assessment.rubric,
-      assessment.marks
-    );
+    const pool = await ConnectionManager.getInstance().getPool();
+    const assessmentResult = await pool.request()
+      .input('aid', assessmentId)
+      .query('SELECT * FROM Assessment WHERE assessmentID = @aid');
+
+    const assessment = assessmentResult.recordset[0];
+    if (!assessment) return res.status(404).json({ error: 'Assessment not found.' });
+
+    const tester = new TestCase({ assessmentId });
+    const summary = await tester.execute(req.file.buffer, assessment.marks);
+
+    await pool.request()
+      .input('aid', assessmentId)
+      .input('sid', studentId)
+      .input('marks', sql.Decimal(5,2), summary.earnedMarks)
+      .input('feedback', `Autograded: ${summary.passedCount}/${summary.totalCount} tests passed.`)
+      .query(`
+        INSERT INTO Grades (AssessmentID, StudentID, TotalMarks, Feedback)
+        VALUES (@aid, @sid, @marks, @feedback)
+      `);
 
     ensureStudentObserver(studentId);
     globalAutogradeSubject.notifyAutogradeComplete({
@@ -197,56 +158,42 @@ router.post('/autograde', upload.single('file'), async (req, res) => {
 
     return res.json({ ok: true, summary });
   } catch (err) {
-    console.error(err);
+    console.error('Autograde Error:', err);
     return res.status(500).json({ error: err.message });
   }
 });
 
-/** Student-visible tests (policy: only after marked) */
-router.get('/assessments/:id/visible-tests', (req, res) => {
-  const a = assessments.get(req.params.id);
-  if (!a) return res.status(404).json({ error: 'Assessment not found.' });
-  if (!a.testCase) return res.status(400).json({ error: 'No test cases on this assessment.' });
-  return res.json(a.testCase.showVisibleTests());
-});
-
-/** Download solution key — validates deadline + release state */
-router.get('/assessments/:id/solution-key/download', (req, res) => {
-  const userID = Number(req.query.userId || req.query.userID);
-  if (!userID) return res.status(400).json({ error: 'userId query parameter required.' });
-  const a = assessments.get(req.params.id);
-  if (!a || !a.solutionKey) return res.status(404).json({ error: 'Solution key not found.' });
-  try {
-    const payload = a.solutionKey.downloadSolution(userID);
-    res.setHeader('Content-Type', payload.mimeType);
-    res.setHeader('Content-Disposition', `attachment; filename="${payload.fileName}"`);
-    return res.send(payload.buffer);
-  } catch (err) {
-    return res.status(403).json({ error: err.message, details: err.details });
-  }
-});
-
-/** Plagiarism engine — compares target against full in-memory repository */
+/** 5. Plagiarism engine — compares target against SQL repository */
 router.post('/plagiarism/run', express.json(), async (req, res) => {
   try {
     const { targetSubmissionId } = req.body;
-    if (!targetSubmissionId) {
-      return res.status(400).json({ error: 'targetSubmissionId is required.' });
-    }
-    const target = submissions.get(targetSubmissionId);
-    if (!target) return res.status(404).json({ error: 'Submission not found.' });
+    const pool = await ConnectionManager.getInstance().getPool();
+    
+    // Get the target file
+    const targetRes = await pool.request()
+      .input('id', targetSubmissionId)
+      .query('SELECT * FROM Submissions WHERE SubmissionID = @id');
+    
+    if (targetRes.recordset.length === 0) return res.status(404).json({ error: 'Submission not found.' });
+    const target = targetRes.recordset[0];
 
-    const repo = Array.from(submissions.values());
+    // Get all other files for same assessment to compare
+    const othersRes = await pool.request()
+      .input('aid', target.AssignmentID)
+      .input('tid', target.SubmissionID)
+      .query('SELECT * FROM Submissions WHERE AssignmentID = @aid AND SubmissionID != @tid');
+
+    const repo = othersRes.recordset;
     const engine = new MatchResults();
     const report = await engine.runAnalysis(target, repo);
+    
     return res.json({ ok: true, report: engine.getComparisonReport() });
   } catch (err) {
-    console.error(err);
-    return res.status(500).json({ error: err.message });
+    res.status(500).json({ error: err.message });
   }
 });
 
-/** Observer demo: poll dashboard notifications for a student */
+/** Observer demo: poll dashboard notifications */
 router.get('/students/:studentId/notifications', (req, res) => {
   const observer = ensureStudentObserver(req.params.studentId);
   return res.json({ studentId: req.params.studentId, notifications: observer.getNotifications() });

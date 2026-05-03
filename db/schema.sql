@@ -137,3 +137,41 @@ VALUES
 
     SELECT * FROM CourseClass;
     SELECT * FROM Assessment;
+
+    CREATE TABLE TestCases (
+    TestCaseID INT PRIMARY KEY IDENTITY(1,1) NOT NULL,
+    AssessmentID INT NOT NULL,
+    Input NVARCHAR(MAX) NULL,          -- The stdin (e.g., "3 5")
+    ExpectedOutput NVARCHAR(MAX) NOT NULL, -- The stdout (e.g., "8")
+    Marks INT DEFAULT 0,                -- Marks awarded for passing THIS specific test
+    FOREIGN KEY (AssessmentID) REFERENCES Assessment(assessmentID) ON DELETE CASCADE
+);
+
+-- Sample Data for Assessment 2 (Linked List - Code Type)
+INSERT INTO TestCases (AssessmentID, Input, ExpectedOutput, Marks)
+VALUES 
+(2, '5 10 15', '15 10 5', 10), -- Test Case 1: Reverse logic
+(2, '1', '1', 10);              -- Test Case 2: Single node
+
+
+CREATE TABLE Grades (
+    GradeID INT PRIMARY KEY IDENTITY(1,1) NOT NULL,
+    AssessmentID INT NOT NULL,
+    StudentID INT NOT NULL,
+    TotalMarks DECIMAL(5,2),
+    Feedback NVARCHAR(MAX),
+    GradedAt DATETIME DEFAULT GETDATE(),
+    FOREIGN KEY (AssessmentID) REFERENCES Assessment(assessmentID),
+    FOREIGN KEY (StudentID) REFERENCES Users(UserID)
+);
+
+CREATE TABLE Rubrics (
+    RubricID INT PRIMARY KEY IDENTITY(1,1) NOT NULL,
+    AssessmentID INT NOT NULL,
+    CriterionDescription NVARCHAR(255) NOT NULL,
+    MaxPoints INT NOT NULL,
+    FOREIGN KEY (AssessmentID) REFERENCES Assessment(assessmentID) ON DELETE CASCADE
+);
+
+ALTER TABLE Assessment ADD SolutionKey VARBINARY(MAX) NULL;
+ALTER TABLE Assessment ADD SolutionKeyName NVARCHAR(255) NULL;
