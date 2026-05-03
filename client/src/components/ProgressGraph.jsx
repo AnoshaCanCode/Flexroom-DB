@@ -10,8 +10,6 @@ import {
   YAxis,
 } from "recharts";
 import "./ProgressGraph.css";
-import Topbar from "./Topbar";
-import Sidebar from "./Sidebar";
 
 const users = [
   {
@@ -157,8 +155,6 @@ const graphLinePalette = {
 };
 
 function ProgressGraph() {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
   const chartData = useMemo(() => {
     const student = users[0];
 
@@ -187,107 +183,65 @@ function ProgressGraph() {
   }, []);
 
   return (
-    <div className="progress-page">
-      <div className="progress-shell">
-        <Topbar userName={users[0].Name} toggleSidebar={() => setIsSidebarOpen((prev) => !prev)} />
-
-        <div className="content-row">
-          <Sidebar isOpen={isSidebarOpen} userRole={users[0].UserRole} />
-
-          <main className="main-panel">
-            <div className="subject-strip">
-              <h1 className="subject-title">{courseClass.className}</h1>
-              <p className="subject-subtitle">{courseClass.sectionLabel}</p>
-            </div>
-
-            <section className="chart-section">
-              <p className="chart-axis-label">Performance (%)</p>
-
-              <div className="chart-wrapper">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart
-                    data={chartData}
-                    margin={{
-                      top: 14,
-                      right: isSidebarOpen ? 35 : 42,
-                      left: isSidebarOpen ? 3 : 9,
-                      bottom: 15,
-                    }}
-                  >
-                    <CartesianGrid stroke="#d9d9cf" vertical={false} />
-                    <XAxis dataKey="assessmentLabel" tick={{ fill: "#3e4432", fontSize: 11 }} stroke="#8f9481" />
-                    <YAxis
-                      domain={[0, 120]}
-                      tickCount={7}
-                      tick={{ fill: "#3e4432", fontSize: 11 }}
-                      stroke="#8f9481"
-                    />
-                    <Tooltip
-                      cursor={{ stroke: "#9ba089", strokeDasharray: "3 3" }}
-                      contentStyle={{
-                        borderRadius: "8px",
-                        borderColor: "#c6c7b9",
-                        fontSize: "12px",
-                      }}
-                      formatter={(value, key) => {
-                        if (key === "similarity") {
-                          return [`${value}%`, "Similarity"];
-                        }
-                        return [value, key];
-                      }}
-                    />
-                    <Legend verticalAlign="top" align="right" iconType="square" wrapperStyle={{ fontSize: "10px" }} />
-
-                    <Line
-                      type="monotone"
-                      dataKey="myPerformance"
-                      name="My Performance"
-                      stroke={graphLinePalette.myPerformance}
-                      strokeWidth={2}
-                      dot={false}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="classAverage"
-                      name="Class Average"
-                      stroke={graphLinePalette.classAverage}
-                      strokeWidth={2}
-                      dot={false}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="classMin"
-                      name="Class Min"
-                      stroke={graphLinePalette.classMin}
-                      strokeWidth={2}
-                      dot={false}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="classMax"
-                      name="Class Max"
-                      stroke={graphLinePalette.classMax}
-                      strokeWidth={2}
-                      dot={false}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-
-              <div className="marked-summary">
-                <p>
-                  Marked
-                  <br />
-                  Assignments
-                  <br />
-                  (4/{courseClass.numStudents})
-                </p>
-              </div>
-            </section>
-          </main>
-        </div>
+    // Removed the "progress-shell", "Topbar", and "Sidebar" components
+    <main className="main-panel">
+      <div className="subject-strip">
+        <h1 className="subject-title">{courseClass.className}</h1>
+        <p className="subject-subtitle">{courseClass.sectionLabel}</p>
       </div>
-    </div>
+
+      <section className="chart-section">
+        <p className="chart-axis-label">Performance (%)</p>
+
+        <div className="chart-wrapper">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart
+              data={chartData}
+              margin={{ top: 14, right: 30, left: 10, bottom: 15 }}
+            >
+              <CartesianGrid stroke="#d9d9cf" vertical={false} />
+              <XAxis dataKey="assessmentLabel" tick={{ fill: "#3e4432", fontSize: 11 }} stroke="#8f9481" />
+              <YAxis
+                domain={[0, 120]}
+                tickCount={7}
+                tick={{ fill: "#3e4432", fontSize: 11 }}
+                stroke="#8f9481"
+              />
+              <Tooltip
+                cursor={{ stroke: "#9ba089", strokeDasharray: "3 3" }}
+                contentStyle={{
+                  borderRadius: "8px",
+                  borderColor: "#c6c7b9",
+                  fontSize: "12px",
+                }}
+                formatter={(value, key) => {
+                  if (key === "similarity") {
+                    return [`${value}%`, "Similarity"];
+                  }
+                  return [value, key];
+                }}
+              />
+              <Legend verticalAlign="top" align="right" iconType="square" wrapperStyle={{ fontSize: "10px" }} />
+
+              <Line type="monotone" dataKey="myPerformance" name="My Performance" stroke={graphLinePalette.myPerformance} strokeWidth={2} dot={false} />
+              <Line type="monotone" dataKey="classAverage" name="Class Average" stroke={graphLinePalette.classAverage} strokeWidth={2} dot={false} />
+              <Line type="monotone" dataKey="classMin" name="Class Min" stroke={graphLinePalette.classMin} strokeWidth={2} dot={false} />
+              <Line type="monotone" dataKey="classMax" name="Class Max" stroke={graphLinePalette.classMax} strokeWidth={2} dot={false} />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+
+        <div className="marked-summary">
+          <p>
+            Marked
+            <br />
+            Assignments
+            <br />
+            (4/{courseClass.numStudents})
+          </p>
+        </div>
+      </section>
+    </main>
   );
 }
 
