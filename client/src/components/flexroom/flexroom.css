@@ -1,0 +1,256 @@
+/* Reset */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* The main shell: Stacked vertically */
+.fr-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  min-height: 100dvh;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* The body: Sidebar and Content side-by-side */
+.fr-body {
+  display: flex;
+  flex: 1; /* Takes up all space left by the topbar */
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Sidebar: Now a Flex Column */
+.fr-sidebar-container {
+  width: 220px;
+  flex-shrink: 0;
+  transition: width 0.3s ease;
+  background-color: #fff;
+  display: flex;
+  flex-direction: column; /* Stacks items vertically */
+  border-right: 1px solid #ddd;
+  overflow: hidden; /* Ensures nothing spills out */
+}
+
+/* Nav Menu: Pushes content to the top */
+.fr-sidebar-container nav, 
+.fr-sidebar-container ul {
+  flex-grow: 1; /* Takes available space at the top */
+  display: flex;
+  flex-direction: column;
+  padding-top: 0px; /* Moves content up slightly */
+}
+
+/* Shrink Text Size */
+.fr-sidebar-container a, 
+.fr-sidebar-container span {
+  font-size: 0.9rem; /* Smaller text to fit more items */
+ 
+}
+
+/* Ensure the Logo Container is always at the bottom */
+.fr-sidebar-logo-container {
+  padding: 5px;
+  flex-shrink: 0; /* Keeps it from being squished */
+}
+
+.fr-sidebar-container.closed {
+  width: 60px; /* Or 0px if you want it to hide completely */
+}
+
+/* Content Area: Fills remaining horizontal space */
+.fr-content-area {
+  flex: 1;
+  height: 100%;
+  overflow: hidden;
+  min-height: 0;
+  padding: 0;
+  background-color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/*added*/
+/* Color Palette */
+:root {
+  --dark-green: #6a714b; 
+  --light-green: #aab18b; 
+}
+
+/* 1. Dark Green Headers (For Rubric & Comments) */
+.side-panel-header {
+  background-color: var(--dark-green);
+  color: white;
+  padding: 10px 15px;
+  font-weight: 600;
+  border-radius: 4px 4px 0 0;
+}
+
+/* 2. Light Green Banner (For OS Title Section) */
+.fr-page-pad {
+  padding: 14px 24px 0;
+  min-height: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.fr-course-banner {
+  min-height: 52px;
+  border-bottom: 1px solid #d3d4c8;
+  background: #d4d8c3;
+  padding: 6px 16px 8px;
+}
+
+.fr-course-banner h2 {
+  margin: 0;
+  color: #2d3521;
+  font-size: 25px;
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.fr-course-banner p {
+  margin: 4px 0 0;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  line-height: 1;
+}
+
+.fr-card.fr-assignment-main {
+  flex: 1;      /* This allows the card to stretch to the bottom */
+  display: flex;       /* Added to manage internal layout if needed */
+  flex-direction: column;
+  margin-bottom: 0;
+}
+
+.fr-student-layout {
+  display: flex;
+  gap: 18px;
+  align-items: stretch;
+  flex: 1;
+  min-height: 0;
+}
+
+.fr-evaluator-main,
+.fr-student-main {
+  flex: 1;
+  min-height: 0;
+  flex-direction: column;
+  display: flex;
+}
+
+.fr-student-sidebar {
+  width: 280px;
+  flex: 0 0 280px;
+  display: flex;
+  flex-direction: column;
+
+}
+
+.fr-rubric-panel {
+  flex: 1;
+  min-height: 0;
+  margin-bottom: 12px;
+  overflow-y: auto;
+}
+
+.fr-comment-panel {
+  flex: 0 0 auto;
+  min-height: 92px;
+}
+
+.fr-upload-stack {
+  width: 380px;
+  max-width: 100%;
+}
+
+.fr-pdf-box {
+  width: 218px;
+  height: 96px;
+  border-radius: 12px;
+  background: #f0f1ed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fr-pdf-box span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 48px;
+  border-radius: 10px;
+  background: #e2e5dd;
+  color: #2f3528;
+  font-size: 34px;
+  font-weight: 700;
+}
+
+.fr-upload-card {
+  width: 360px;
+  max-width: 100%;
+  background: #f0f1ed;
+}
+
+.fr-drop {
+  min-height: 112px;
+  border: 2px dashed #b9bdaf;
+  border-radius: 14px;
+  background: #eceee7;
+  color: #7f8573;
+  font-size: 14px;
+}
+
+.fr-drop.drag {
+  border-color: #8f9779;
+  background: #e1e5d8;
+}
+
+.fr-green-btn {
+  width: 100%;
+  height: 32px;
+  border-radius: 999px;
+  background: #aab18b;
+  border: none;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.fr-green-btn:hover {
+  background: #9da883;
+  color: #fff;
+}
+
+.fr-eval-table-wrap {
+  flex: 1 1 auto;
+  min-height: 0;
+  margin-bottom: 0;
+  padding-bottom: 0;
+  display: flex;
+  align-items: flex-start;
+}
+
+.fr-upload-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.fr-student-page, 
+.fr-evaluator-page {
+  display: flex;
+  flex-direction: column;
+  flex: 1; /* This pushes the content to the bottom of the viewport */
+  min-height: 0;
+}
+
+.fr-student-toolbar,
+.fr-evaluator-toolbar {
+  flex: 0 0 auto;
+}
