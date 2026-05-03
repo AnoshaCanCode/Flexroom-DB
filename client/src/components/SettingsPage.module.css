@@ -1,0 +1,115 @@
+/* Container for the settings page content area */
+.settingsPageContainer {
+  padding: 2rem; /* Give some breathing room from the edges of the main layout */
+  display: flex;
+  justify-content: center; /* Center the main content area horizontally */
+  min-height: 80vh; /* Optional: ensures minimum height for the whole page */
+}
+
+/* The main box holding all the settings content */
+.mainSettingsContent {
+  background-color: #dfdfdf; /* Match your content background color */
+  padding: 2rem;
+  width: 100%;
+  max-width: 600px; /* Optional: prevents settings from stretching too wide on huge screens */
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center all contents horizontally inside */
+  border-radius: 8px; /* Smooth corners for the main content block */
+}
+
+/* PROFILE SECTION */
+.profileSection {
+  margin-top: 3rem; /* Push down to center vertically or as per design */
+  margin-bottom: 4rem; /* Space before the buttons */
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.profileImageWrapper {
+  position: relative; /* Crucial for positioning the pencil icon */
+  width: 150px; /* Larger than typical dashboard header icons */
+  height: 150px; /* Larger than typical dashboard header icons */
+}
+
+.largeProfileIcon {
+  width: 100%;
+  height: 100%;
+  background-color: #f1f1f1; /* Assuming we are just rendering an emoji or SVG placeholder */
+  border: 4px solid #000; /* Dark border as per your design */
+  border-radius: 50%; /* Make it perfectly round */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 5rem; /* Larger emoji/placeholder size */
+  color: #fff; /* White emoji/placeholder on transparent background */
+  overflow: hidden; /* Ensure anything else stays round */
+}
+
+/* Pencil Button */
+.editProfileBtn {
+  position: absolute;
+  bottom: 0px; /* Position at the bottom of the circle */
+  right: 0px; /* Position at the right of the circle */
+  width: 40px; /* Small icon button */
+  height: 40px; /* Small icon button */
+  background-color: #fefefe; /* Match the content background for seamlessness, or just white */
+  border: 2px solid #a8a8a8; /* Greyish border as seen in screenshot */
+  border-radius: 50%; /* Perfectly round */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Slight shadow to make it pop *Optional* */
+  transition: all 0.2s ease-in-out; /* Smooth hover transition */
+  padding: 0;
+  overflow: hidden;
+}
+
+.editProfileBtn:hover {
+  background-color: #eaeaea; /* Slight darken on hover */
+  transform: scale(1.05); /* Slight enlarge on hover *Optional* */
+}
+
+/* ACTIONS SECTION */
+.actionsSection {
+  width: 100%;
+  max-width: 350px; /* Width of the buttons */
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem; /* Space between buttons */
+  margin-bottom: auto; /* Push the footer down to the very bottom */
+}
+
+/* Primary Action Buttons (Change Password & Log Out) */
+.primaryActionBtn {
+  background-color: #616e4b; /* Reuse your green/olive color */
+  color: white;
+  border: none;
+  border-radius: 20px; /* Rounded corners as per image */
+  padding: 0.8rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  width: 100%;
+}
+
+.primaryActionBtn:hover {
+  background-color: #4b5320; /* Darker green on hover */
+}
+
+/* FOOTER SECTION */
+.footerSection {
+  margin-top: auto; /* Pushes the logo to the bottom of the container */
+  padding-bottom: 2rem;
+  display: flex;
+  justify-content: center;
+}
+
+.footerLogoImg {
+  width: 70px; /* Adjust size to match your design */
+  height: 70px;
+  opacity: 0.7; /* Optional: makes it look like a subtle watermark/footer */
+}
