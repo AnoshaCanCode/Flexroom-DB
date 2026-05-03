@@ -101,3 +101,14 @@ CREATE TABLE Assessment (
 - Evaluators can see all submissions and plagiarism results.
 - File uploads are stored as binary in SQL.
 - Frontend must send JSON objects with keys matching SQL column names.
+
+##Design Patterns to Implement:
+- State
+- Template
+- Adapter 
+- Observer
+- Iterator
+- Singleton 
+- Factory
+- Composite Design Pattern
+
