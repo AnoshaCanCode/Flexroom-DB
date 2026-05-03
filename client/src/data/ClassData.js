@@ -1,6 +1,4 @@
 // we will remove this file later when we connect. this is just dummy data
-import { HiBookOpen, HiCalculator, HiDesktopComputer, HiGlobeAlt } from 'react-icons/hi';
-
 export const classList = [
     {
         id: 1,

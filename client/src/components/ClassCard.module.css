@@ -78,6 +78,11 @@
   color: #555; /* Slightly lighter for assignment name */
 }
 
+.evaluatorAssignmentTitle {
+  font-size: 14px; /* Bigger */
+  color: #555; /* Slightly darker/different color */
+}
+
 .noAssignments {
   font-size: 0.85rem;
   color: #7a7a7a;    /* A soft grey that is legible but not distracting */
