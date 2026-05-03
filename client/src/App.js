@@ -8,6 +8,8 @@ import EvaluatorPage from './components/flexroom/EvaluatorPage';
 import DashboardLayout from './components/DashboardLayout';
 import StudentDashboard from './pages/StudentDashboard';
 import EvaluatorDashboard from './pages/EvaluatorDashboard';
+import SettingsPage from './components/SettingsPage';
+import ChangePassword from './components/ChangePassword';
 
 const FRAME_WIDTH = 1440;
 const FRAME_HEIGHT = 1024;
@@ -66,6 +68,10 @@ function App() {
         <Route path="/" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/progress" element={<ProgressGraph />} />
+
+        {/* Add this flat route so it doesn't get the DashboardLayout */}
+        <Route path="/change-password" element={<ChangePassword />} />
+        
         <Route
           path="/flexroom/student"
           element={<ScaledFrame><StudentPage /></ScaledFrame>}
@@ -77,6 +83,7 @@ function App() {
         {/* Student Route with Layout */}
         <Route path="/student" element={<DashboardLayout userRole="student" />}>
           <Route index element={<StudentDashboard />} />
+          <Route path="settings" element={<SettingsPage />} /> {/* This registers the route! */}
         </Route>
 
         {/* Evaluator Route with Layout */}

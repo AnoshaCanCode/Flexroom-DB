@@ -28,9 +28,12 @@ const SettingsPage = () => {
         </div>
 
         <div className={styles.actionsSection}>
-          <button className={styles.primaryActionBtn} onClick={handleChangePassword}>
-            Change Password
-          </button>
+          <button 
+             className={styles.primaryActionBtn} 
+            onClick={() => navigate('/change-password')} // Update this path
+            >
+             Change Password
+            </button>
           <button className={styles.primaryActionBtn} onClick={handleLogout}>
             Log Out
           </button>
