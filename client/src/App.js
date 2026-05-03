@@ -8,6 +8,8 @@ import EvaluatorPage from './components/flexroom/EvaluatorPage';
 import DashboardLayout from './components/DashboardLayout';
 import StudentDashboard from './pages/StudentDashboard';
 import EvaluatorDashboard from './pages/EvaluatorDashboard';
+import CreateDocAssignmentPage from './pages/CreateDocAssignmentPage';
+import CreateCodeAssignmentPage from './pages/CreateCodeAssignmentPage';
 
 const FRAME_WIDTH = 1440;
 const FRAME_HEIGHT = 1024;
@@ -82,6 +84,13 @@ function App() {
         {/* Evaluator Route with Layout */}
         <Route path="/evaluator" element={<DashboardLayout userRole="evaluator" />}>
           <Route index element={<EvaluatorDashboard />} />
+        </Route>
+
+        <Route path="/create-doc-assignment" element={<DashboardLayout userRole="evaluator" />}>
+          <Route index element={<CreateDocAssignmentPage />} />
+        </Route>
+        <Route path="/create-code-assignment" element={<DashboardLayout userRole="evaluator" />}>
+          <Route index element={<CreateCodeAssignmentPage />} />
         </Route>
       </Routes>
     </Router>

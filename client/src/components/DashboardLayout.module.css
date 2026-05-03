@@ -48,6 +48,14 @@
     overflow: hidden;
 }
 
+.dashboardContainer {
+    padding: 8px 0 24px;
+}
+
+.dashboardContainer h1 {
+    margin-bottom: 16px;
+}
+
 .grid {
   display: grid;
   /* Match the 280px width you just set for the cards */
