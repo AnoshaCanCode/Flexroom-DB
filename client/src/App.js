@@ -11,6 +11,7 @@ import EvaluatorDashboard from './pages/EvaluatorDashboard';
 import SettingsPage from './components/SettingsPage';
 import ChangePassword from './components/ChangePassword';
 import UploadPicture from './components/UploadPicture';
+import CalendarPage from './pages/CalendarPage';
 
 const FRAME_WIDTH = 1440;
 const FRAME_HEIGHT = 1024;
@@ -86,6 +87,7 @@ function App() {
         <Route path="/student" element={<DashboardLayout userRole="student" />}>
           <Route index element={<StudentDashboard />} />
           <Route path="settings" element={<SettingsPage />} /> {/* This registers the route! */}
+          <Route path="calendar" element={<CalendarPage />} />
         </Route>
 
         {/* Evaluator Route with Layout */}

@@ -22,7 +22,7 @@
 .bottomSection {
     border-top: 1px solid #ddd;
     padding-top: 10px;
-    padding-bottom: 40px; /* Adds space at the very bottom of the sidebar */
+    padding-bottom: 5px; /* Adds space at the very bottom of the sidebar */
     display: flex;
     flex-direction: column; /* Ensures Logout and Logo stack nicely */
 }
@@ -70,4 +70,12 @@
 .icon {
     font-size: 20px;
     min-width: 30px; /* Ensures space for icon even if collapsed */
+}
+
+.navLink {
+    display: flex;
+    align-items: center;
+    text-decoration: none; /* Removes underline */
+    color: inherit;        /* Keeps your existing text color */
+    width: 100%;
 }

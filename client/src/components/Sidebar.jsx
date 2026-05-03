@@ -2,21 +2,23 @@ import React from 'react';
 import { HiHome, HiCalendar, HiUserGroup, HiCog, HiLogout } from 'react-icons/hi';
 import styles from './Sidebar.module.css';
 import CircleLogo from './assets/round-green.png';
+import { Link } from 'react-router-dom'; // 1. Import Link
 
 const Sidebar = ({ isOpen, userRole }) => {
     
     // 1. Group items that stay at the top
+    // Added 'path' to these objects
     const mainNav = [
-        { name: 'Home', icon: <HiHome /> },
-        userRole === 'student' // Show Calendar for Student, People for Evaluator
-            ? { name: 'Calendar', icon: <HiCalendar /> } 
-            : { name: 'People', icon: <HiUserGroup /> }
+        { name: 'Home', icon: <HiHome />, path: '/student' }, // Change '/home' to '/student'
+        userRole === 'student'
+            ? { name: 'Calendar', icon: <HiCalendar />, path: '/student/calendar' } // Updated path
+            : { name: 'People', icon: <HiUserGroup />, path: '/evaluator/people' }
     ];
 
     // 2. Group items for the bottom
     const footerNav = [
-        { name: 'Settings', icon: <HiCog /> },
-        { name: 'Logout', icon: <HiLogout /> }
+        { name: 'Settings', icon: <HiCog />, path: '/student/settings' }, // Updated path
+        { name: 'Logout', icon: <HiLogout />, path: '/logout' }
     ];
 
     return (
@@ -26,9 +28,12 @@ const Sidebar = ({ isOpen, userRole }) => {
                 <ul className={styles.navMenu}>
                     {mainNav.map((item) => (
                         <li key={item.name} className={styles.navItem}>
-                            <span className={styles.icon}>{item.icon}</span>
-                            {/* Only show text if sidebar is open */}
-                            {isOpen && <span>{item.name}</span>}
+                            {/* Wrap your icon and text in the Link component */}
+                            <Link to={item.path} className={styles.navLink}>
+                                <span className={styles.icon}>{item.icon}</span>
+                                {/* Only show text if sidebar is open */}
+                                {isOpen && <span>{item.name}</span>}
+                            </Link>
                         </li>
                     ))}
                 </ul>
@@ -39,8 +44,11 @@ const Sidebar = ({ isOpen, userRole }) => {
                 <ul className={styles.navMenu}>
                     {footerNav.map((item) => (
                         <li key={item.name} className={styles.navItem}>
-                            <span className={styles.icon}>{item.icon}</span>
-                            {isOpen && <span>{item.name}</span>}
+                            {/* Wrap your icon and text in the Link component */}
+                            <Link to={item.path} className={styles.navLink}>
+                                <span className={styles.icon}>{item.icon}</span>
+                                {isOpen && <span>{item.name}</span>}
+                            </Link>
                         </li>
                     ))}
                 </ul>

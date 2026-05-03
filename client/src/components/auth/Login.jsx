@@ -44,7 +44,7 @@ const Login = () => {
 
         // --- WHERE THE BACKEND VERIFICATION CALL WILL GO LATER ---
         // (Next Victory: fetch('/api/login', { method: 'POST', ... }))
-        navigate(nextRole === 'student' ? '/flexroom/student' : '/flexroom/evaluator');
+        navigate(nextRole === 'student' ? '/student' : '/evaluator');
     };
 
     return (
