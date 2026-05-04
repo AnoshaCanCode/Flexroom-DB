@@ -18,6 +18,7 @@ import SubmissionPage from './pages/SubmissionPage';
 import CreateDocAssignmentPage from './pages/CreateDocAssignmentPage';
 import CreateCodeAssignmentPage from './pages/CreateCodeAssignmentPage';
 import EvaluationInterface from './components/flexroom/EvaluationInterface';
+import StudentClassView from './components/flexroom/StudentClassView';
 
 const FRAME_WIDTH = 1440;
 const FRAME_HEIGHT = 1024;
@@ -97,6 +98,7 @@ function App() {
 
         <Route path="/evaluator/class/:id" element={<EvaluatorPage />} />
         <Route path="/evaluator/evaluate/:assignmentId/:studentId" element={<EvaluationInterface />} />
+        <Route path="/student/class/:classId" element={<StudentClassView />} />
 
         {/* Student Route with Layout */}
         <Route path="/student" element={<DashboardLayout userRole="student" />}>
