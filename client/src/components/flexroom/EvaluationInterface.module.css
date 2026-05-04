@@ -1,0 +1,144 @@
+/* Container for the whole evaluation page */
+.evaluationGrid {
+  display: grid;
+  grid-template-columns: 1fr 320px; /* Main viewer + 320px sidebar */
+  gap: 20px;
+  padding: 20px;
+
+  height: auto;           /* Remove min-height: 85vh; */
+  min-height: 100vh;      /* Ensure it takes up at least the full screen */
+  overflow-y: visible;    /* Allow the page to scroll */
+  background-color: #f9f9f9;
+}
+
+.courseBanner {
+  background-color: #aab18b; /* Flexroom olive-grey theme */
+  padding: 15px 25px;
+  border-bottom: 2px solid #b5b8a5;
+  margin-bottom: 10px;
+}
+
+.courseBanner h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #333;
+}
+
+/* --- Main Media Area (Left Side) --- */
+.mediaArea {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+.dualPane {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.pane {
+  display: flex;
+  flex-direction: column;
+}
+
+.paneHeader {
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #555;
+  border-bottom: 1px solid #eee;
+}
+
+.codeBlock {
+  background: #272822; /* Classic dark theme for code */
+  color: #f8f8f2;
+  padding: 15px;
+  border-radius: 5px;
+  overflow-x: auto;
+  font-family: 'Courier New', monospace;
+  height: 400px;
+}
+
+/* --- Rubric Sidebar (Right Side) --- */
+.rubricArea {
+  background: white;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  height: fit-content;
+}
+
+.rubricHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 10px;
+}
+
+.rubricItem {
+  display: flex;
+  align-items: center;
+  padding: 15px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.pointCircle {
+  background: #d6d9c6;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  margin-right: 15px;
+}
+
+.obtainedInput {
+  width: 50px;
+  padding: 5px;
+  margin-left: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.submitMarksBtn {
+  margin-top: 20px;
+  width: 100%;
+  padding: 12px;
+  background-color: #4a5d4e;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.submitMarksBtn:hover {
+  background-color: #364639;
+}
+
+/* --- Test Case Specifics --- */
+.testCasesPanel {
+  margin-top: 20px;
+  padding: 15px;
+  background: #f0f0f0;
+  border-radius: 5px;
+}
+
+.testCaseItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.idCircle {
+  background: #888;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+}

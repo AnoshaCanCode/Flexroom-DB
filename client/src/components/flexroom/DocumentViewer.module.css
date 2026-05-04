@@ -1,0 +1,52 @@
+.viewerContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.dualPane {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.pane {
+  display: flex;
+  flex-direction: column;
+}
+
+.paneHeader {
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #555;
+  border-bottom: 1px solid #eee;
+}
+
+.mediaFrame {
+  position: relative;
+  background: #eee;
+  height: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+}
+
+.navBtn {
+  position: absolute;
+  top: 50%;
+  background: rgba(255, 255, 255, 0.8);
+  border: none;
+  border-radius: 50%;
+  padding: 10px;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.left { left: 10px; }
+.right { right: 10px; }
+
+.pdfMock {
+  text-align: center;
+  color: #888;
+}

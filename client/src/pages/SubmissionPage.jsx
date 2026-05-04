@@ -5,6 +5,20 @@ import styles from './PeoplePage.module.css';
 const SubmissionsPage = () => {
     const navigate = useNavigate();
 
+    // Placeholder assignment ID - replace with dynamic ID from props/context
+    const assignmentId = "assignment-123";
+
+    // Navigation handler
+    const handleRowClick = (student, type) => {
+        // You can determine the type (document/code) from the student object
+        // assuming your data structure has a 'type' property.
+        const assignmentType = student.type || 'document'; 
+        
+        navigate(`/evaluator/evaluate/${assignmentId}/${student.id}`, { 
+            state: { type: assignmentType } 
+        });
+    };
+
     // Section 1: Submissions Data (Only S.No and Name)
     const pendingSubmissions = {
         title: 'Submissions',
@@ -41,7 +55,11 @@ const SubmissionsPage = () => {
                 </thead>
                 <tbody>
                     {pendingSubmissions.data.map((student) => (
-                        <tr key={student.id}>
+                        <tr 
+                            key={student.id} 
+                            onClick={() => handleRowClick(student, 'pending')}
+                            style={{ cursor: 'pointer' }}
+                        >
                             <td>{student.id}.</td>
                             <td>{student.name}</td>
                         </tr>
@@ -65,7 +83,11 @@ const SubmissionsPage = () => {
                 </thead>
                 <tbody>
                     {markedSubmissions.data.map((student) => (
-                        <tr key={student.id}>
+                        <tr 
+                            key={student.id} 
+                            onClick={() => handleRowClick(student, 'marked')}
+                            style={{ cursor: 'pointer' }}
+                        >
                             <td>{student.id}.</td>
                             <td>{student.name}</td>
                             <td>{student.marks}</td>

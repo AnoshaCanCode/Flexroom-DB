@@ -1,0 +1,70 @@
+.rubricContainer {
+  background: white;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.rubricHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+}
+
+.totalDisplay {
+  font-weight: bold;
+  color: #4a5d4e;
+}
+
+.rubricBody {
+  display: flex;
+  flex-direction: column;
+}
+
+.rubricItem {
+  display: flex;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.pointCircle {
+  background: #d6d9c6;
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  margin-right: 15px;
+  flex-shrink: 0;
+}
+
+.itemDetails {
+  flex-grow: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.itemTitle {
+  font-size: 0.9rem;
+}
+
+.inputGroup {
+  display: flex;
+  align-items: center;
+  font-size: 0.8rem;
+}
+
+.obtainedInput {
+  width: 45px;
+  padding: 5px;
+  margin-left: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}

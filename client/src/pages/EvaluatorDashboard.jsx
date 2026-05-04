@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import ClassCard from '../components/ClassCard';
 import styles from '../components/DashboardLayout.module.css';
 import { evaluatorClassList } from '../data/EvaluatorClassData';
@@ -12,17 +12,11 @@ const EvaluatorDashboard = () => {
     const [classTitle, setClassTitle] = useState('');
     const [section, setSection] = useState('');
 
-    const defaultClassContext = {
-        courseTitle: 'Operating Systems',
-        courseCode: 'BSCS-4J',
-    };
-
     const handleCreateClass = () => {
         console.log("Creating:", classTitle, section);
         setShowModal(false);
     };
 
-    // The return statement must be here, at the top level of the component
     return (
         <div className={styles.dashboardContainer}>
             <div className={styles.headerRow}>
@@ -74,25 +68,7 @@ const EvaluatorDashboard = () => {
                     </div>
                 ))}
             </div>
-
-            <div style={{ marginTop: 32, display: 'flex', flexWrap: 'wrap', gap: 12 }}>
-                <Link
-                    to="/create-doc-assignment"
-                    state={defaultClassContext}
-                    className="btn btn-lg"
-                    style={{ background: '#6a714b', color: '#fff', borderRadius: 999 }}
-                >
-                    New document assignment
-                </Link>
-                <Link
-                    to="/create-code-assignment"
-                    state={defaultClassContext}
-                    className="btn btn-lg"
-                    style={{ background: '#6a714b', color: '#fff', borderRadius: 999 }}
-                >
-                    New code assignment
-                </Link>
-            </div>
+            {/* The buttons were removed from here */}
         </div>
     );
 };
