@@ -7,6 +7,13 @@ const gradingRoutes = require('./routes/gradingRoutes');
 const app = express();               // 4. THIS IS THE MISSING LINE
 const PORT = 5000;
 const userRoutes = require('./routes/userRoutes');
+// 1. Import the routes
+const fileRoutes = require('./src/routes/fileRoutes');
+
+// ... other middleware like app.use(express.json()) ...
+
+// 2. Register the routes
+app.use('/api/files', fileRoutes);
 app.use('/api/users', userRoutes);
 
 app.use(express.json({ limit: '10mb' }));
