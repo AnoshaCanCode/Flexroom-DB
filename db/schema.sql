@@ -95,10 +95,9 @@ VALUES
 SELECT * FROM StudentProfiles;
 SELECT * FROM EvaluatorProfiles;
 
-
 CREATE TABLE CourseClass (
     classID INT PRIMARY KEY,
-    courseID INT NOT NULL REFERENCES Course(courseID),
+    courseID INT NOT NULL DEFAULT 0,
     className NVARCHAR(100) NOT NULL,
     classCode INT NOT NULL UNIQUE,
     generatedDate NVARCHAR(20) NOT NULL,
