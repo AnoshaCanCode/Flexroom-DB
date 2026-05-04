@@ -1,28 +1,37 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Outlet } from 'react-router-dom';
-import Sidebar from './Sidebar'; 
+import Sidebar from './Sidebar';
 import Topbar from './Topbar';
-import styles from './DashboardLayout.module.css'; // Import module
+import styles from './DashboardLayout.module.css';
 
 const DashboardLayout = ({ userRole }) => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+    const [courseHeader, setCourseHeader] = useState({ title: null, code: null });
+
+    const displayName = useMemo(() => {
+        try {
+            if (userRole === 'evaluator') {
+                return window.localStorage.getItem('flexroomDisplayNameEvaluator') || 'Rida Amir';
+            }
+            return window.localStorage.getItem('flexroomDisplayName') || 'Apple';
+        } catch {
+            return userRole === 'evaluator' ? 'Rida Amir' : 'Apple';
+        }
+    }, [userRole]);
 
     return (
         <div className={styles.layoutContainer}>
-            {/* 1. Full width Topbar */}
-            <Topbar 
-                toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} // This is the 'toggleSidebar' prop the Topbar needs
-                userName="Apple" 
+            <Topbar
+                toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
+                userName={displayName}
+                courseTitle={courseHeader.title}
+                courseCode={courseHeader.code}
             />
-            
-            {/* 2. Body container (Row: Sidebar + Content) */}
+
             <div className={styles.layoutBody}>
-                <Sidebar 
-                    isOpen={isSidebarOpen} 
-                    userRole={userRole} 
-                />
+                <Sidebar isOpen={isSidebarOpen} userRole={userRole} />
                 <main className={styles.mainContent}>
-                    <Outlet />
+                    <Outlet context={{ setCourseHeader }} />
                 </main>
             </div>
         </div>

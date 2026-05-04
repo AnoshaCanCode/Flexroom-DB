@@ -14,6 +14,8 @@ import ChangePassword from './components/ChangePassword';
 import UploadPicture from './components/UploadPicture';
 import CalendarPage from './pages/CalendarPage';
 import PeoplePage from './pages/PeoplePage';
+import CreateDocAssignmentPage from './pages/CreateDocAssignmentPage';
+import CreateCodeAssignmentPage from './pages/CreateCodeAssignmentPage';
 
 const FRAME_WIDTH = 1440;
 const FRAME_HEIGHT = 1024;
@@ -103,6 +105,13 @@ function App() {
           <Route index element={<EvaluatorDashboard />} />
           <Route path="people" element={<PeoplePage />} />
           <Route path="progress/:studentId" element={<ProgressGraph />} />
+        </Route>
+
+        <Route path="/create-doc-assignment" element={<DashboardLayout userRole="evaluator" />}>
+          <Route index element={<CreateDocAssignmentPage />} />
+        </Route>
+        <Route path="/create-code-assignment" element={<DashboardLayout userRole="evaluator" />}>
+          <Route index element={<CreateCodeAssignmentPage />} />
         </Route>
       </Routes>
     </Router>
