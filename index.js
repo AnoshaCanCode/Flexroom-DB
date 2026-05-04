@@ -4,6 +4,14 @@ const config = require('./dbconfig');
 const rateLimit = require('express-rate-limit');
 const gradingRoutes = require('./routes/gradingRoutes');
 const userRoutes = require('./routes/userRoutes');
+// 1. Import the routes
+const fileRoutes = require('./src/routes/fileRoutes');
+
+// ... other middleware like app.use(express.json()) ...
+
+// 2. Register the routes
+app.use('/api/files', fileRoutes);
+app.use('/api/users', userRoutes);
 
 const app = express();
 const PORT = 5000;
