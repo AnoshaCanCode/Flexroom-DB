@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+
 import ClassCard from '../components/ClassCard';
 import styles from '../components/DashboardLayout.module.css';
 import { evaluatorClassList } from '../data/EvaluatorClassData';
 
 const EvaluatorDashboard = () => {
+    const navigate = useNavigate();
     const [showModal, setShowModal] = useState(false);
     
     // New states for the Create Class form
@@ -61,13 +64,18 @@ export default function EvaluatorDashboard() {
 
             <div className={styles.grid}>
                 {evaluatorClassList.map((cls) => (
-                    <ClassCard 
+                    <div 
                         key={cls.id} 
-                        role="evaluator"
-                        title={cls.title} 
-                        section={cls.section} // Passing the section
-                        assignments={cls.assignments}
-                    />
+                        onClick={() => navigate(`/evaluator/class/${cls.id}`)} 
+                        style={{ cursor: 'pointer' }}
+                    >
+                        <ClassCard 
+                            role="evaluator"
+                            title={cls.title} 
+                            section={cls.section}
+                            assignments={cls.assignments}
+                        />
+                    </div>
                 ))}
             </div>
             <div style={{ marginTop: 32, display: 'flex', flexWrap: 'wrap', gap: 12 }}>

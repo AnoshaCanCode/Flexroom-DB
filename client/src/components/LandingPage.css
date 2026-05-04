@@ -100,7 +100,7 @@
 /* FOOTER: 70px height, #5F5F5E */
 .landing-footer {
     height: 70px;
-    background-color: #5F5F5E; /* Requirement 3 */
+    background-color: #aab18b; /* Requirement 3 */
     width: 100%;
     position: fixed;
     bottom: 0;

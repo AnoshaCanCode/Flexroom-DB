@@ -14,6 +14,7 @@ import ChangePassword from './components/ChangePassword';
 import UploadPicture from './components/UploadPicture';
 import CalendarPage from './pages/CalendarPage';
 import PeoplePage from './pages/PeoplePage';
+import SubmissionPage from './pages/SubmissionPage';
 import CreateDocAssignmentPage from './pages/CreateDocAssignmentPage';
 import CreateCodeAssignmentPage from './pages/CreateCodeAssignmentPage';
 
@@ -83,6 +84,8 @@ function App() {
         <Route path="/progress" element={<ProgressGraph />} />
         <Route path="/change-password" element={<ChangePassword />} />
         <Route path="/upload-picture" element={<UploadPicture />} />
+
+        <Route path="/evaluator/submissions/:id" element={<SubmissionPage />} />
         
         <Route
           path="/flexroom/student"
@@ -92,6 +95,8 @@ function App() {
           path="/flexroom/evaluator"
           element={<ScaledFrame><EvaluatorPage /></ScaledFrame>}
         />
+
+        <Route path="/evaluator/class/:id" element={<EvaluatorPage />} />
 
         {/* Student Route with Layout */}
         <Route path="/student" element={<DashboardLayout userRole="student" />}>
@@ -105,6 +110,14 @@ function App() {
           <Route index element={<EvaluatorDashboard />} />
           <Route path="people" element={<PeoplePage />} />
           <Route path="progress/:studentId" element={<ProgressGraph />} />
+          <Route path="settings" element={<SettingsPage />} />
+        </Route>
+
+        <Route path="/create-doc-assignment" element={<DashboardLayout userRole="evaluator" />}>
+          <Route index element={<CreateDocAssignmentPage />} />
+        </Route>
+        <Route path="/create-code-assignment" element={<DashboardLayout userRole="evaluator" />}>
+          <Route index element={<CreateCodeAssignmentPage />} />
         </Route>
 
         <Route path="/create-doc-assignment" element={<DashboardLayout userRole="evaluator" />}>

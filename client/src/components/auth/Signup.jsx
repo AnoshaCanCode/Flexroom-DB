@@ -11,38 +11,41 @@ const Signup = () => {
     const [password, setPassword] = useState('');
     const [userRole, setUserRole] = useState('');
 
-    const handleSignup = (role) => {
-        if (!name.trim() || !email.trim() || !password.trim()) {
-            alert('Please fill in name, email, and password first.');
-            return;
-        }
+    const handleSignup = (e) => {
+    e.preventDefault(); 
+    
+    // 2. Validation
+    if (!name.trim() || !email.trim() || !password.trim()) {
+        alert('Please fill in name, email, and password first.');
+        return;
+    }
+    if (!userRole) {
+        alert('Please choose whether you are signing up as a Student or Evaluator.');
+        return;
+    }
 
-        if (!role) {
-            alert('Please choose whether you are signing up as a Student or Evaluator.');
-            return;
+    try {
+        window.localStorage.setItem('flexroomDisplayName', name.trim());
+        if (userRole === 'evaluator') {
+            window.localStorage.setItem('flexroomDisplayNameEvaluator', name.trim());
         }
+    } catch (_) {
+        // ignore storage issues in local preview
+    }
 
-        try {
-            window.localStorage.setItem('flexroomDisplayName', name.trim());
-            if (role === 'evaluator') {
-                window.localStorage.setItem('flexroomDisplayNameEvaluator', name.trim());
-            }
-        } catch (_) {
-            // ignore storage issues in local preview
-        }
-
-        navigate(role === 'student' ? '/flexroom/student' : '/flexroom/evaluator');
-    };
+    // 3. Use the userRole state variable directly
+    navigate(userRole === 'student' ? '/student' : '/evaluator');
+};
 
     return (
         <div className="container-fluid d-flex justify-content-center align-items-center auth-background vh-100">
             <FaArrowLeft className="back-arrow-extreme" onClick={() => navigate('/')} />
 
-            <form className="auth-form p-5 text-center">
+            {/* Changed to onSubmit={handleSignup} to match Login pattern */}
+            <form className="auth-form p-5 text-center" onSubmit={handleSignup}>
 
                 <h1 className="login-heading mb-5">Sign Up</h1>
 
-                {/* Name Input */}
                 <div className="input-container mb-4">
                     <input 
                         type="text" 
@@ -55,7 +58,6 @@ const Signup = () => {
                     <FaUser className="input-icon" />
                 </div>
 
-                {/* Email Input */}
                 <div className="input-container mb-4">
                     <input 
                         type="email" 
@@ -68,7 +70,6 @@ const Signup = () => {
                     <FaEnvelope className="input-icon" />
                 </div>
 
-                {/* Password Input */}
                 <div className="input-container mb-3">
                     <input 
                         type="password" 
@@ -81,25 +82,18 @@ const Signup = () => {
                     <FaLock className="input-icon" />
                 </div>
 
-                {/* Buttons */}
                 <div className="d-grid gap-2 mb-5">
                     <button 
-                        type="button" 
+                        type="submit" 
                         className={`btn-auth rounded-pill ${userRole === 'student' ? 'active' : ''}`}
-                        onClick={() => {
-                            setUserRole('student');
-                            handleSignup('student');
-                        }}
+                        onClick={() => setUserRole('student')}
                     >
                         Sign Up As Student
                     </button>
                     <button 
-                        type="button" 
+                        type="submit" 
                         className={`btn-auth rounded-pill ${userRole === 'evaluator' ? 'active' : ''}`}
-                        onClick={() => {
-                            setUserRole('evaluator');
-                            handleSignup('evaluator');
-                        }}
+                        onClick={() => setUserRole('evaluator')}
                     >
                         Sign Up As Evaluator
                     </button>

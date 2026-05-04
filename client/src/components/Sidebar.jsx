@@ -21,9 +21,18 @@ const Sidebar = ({ isOpen, userRole }) => {
 
     // 2. Group items for the bottom
     const footerNav = [
-        { name: 'Settings', icon: <HiCog />, path: '/student/settings' }, // Updated path
-        { name: 'Logout', icon: <HiLogout />, path: '/logout' }
-    ];
+    { 
+        name: 'Settings', 
+        icon: <HiCog />, 
+        // This will automatically become '/student/settings' or '/evaluator/settings'
+        path: `/${userRole}/settings` 
+    }, 
+    { 
+        name: 'Logout', 
+        icon: <HiLogout />, 
+        path: '/' 
+    }
+];
 
     return (
         <nav className={`${styles.sidebar} ${!isOpen ? styles.closed : ''}`}>
