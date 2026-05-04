@@ -95,6 +95,7 @@ function App() {
           <Route index element={<EvaluatorDashboard />} />
           <Route path="people" element={<PeoplePage />} />
           <Route path="progress/:studentId" element={<ProgressGraph />} />
+          <Route path="settings" element={<SettingsPage />} />
         </Route>
       </Routes>
     </Router>
