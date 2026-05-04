@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import LandingPage from './components/LandingPage'; // 1. Import the new Landing Page
 import Login from './components/auth/Login'; 
 import Signup from './components/auth/Signup'; 
 import ProgressGraph from "./components/ProgressGraph";
@@ -68,10 +69,16 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Login />} />
+        {/* 2. Change the Root to LandingPage */}
+        <Route path="/" element={<LandingPage />} />
+        
+        {/* 3. Give Login its own specific path */}
+        <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
 
         {/* Add this flat route so it doesn't get the DashboardLayout */}
+        
+        <Route path="/progress" element={<ProgressGraph />} />
         <Route path="/change-password" element={<ChangePassword />} />
         <Route path="/upload-picture" element={<UploadPicture />} />
         
@@ -83,10 +90,11 @@ function App() {
           path="/flexroom/evaluator"
           element={<ScaledFrame><EvaluatorPage /></ScaledFrame>}
         />
+
         {/* Student Route with Layout */}
         <Route path="/student" element={<DashboardLayout userRole="student" />}>
           <Route index element={<StudentDashboard />} />
-          <Route path="settings" element={<SettingsPage />} /> {/* This registers the route! */}
+          <Route path="settings" element={<SettingsPage />} />
           <Route path="calendar" element={<CalendarPage />} />
         </Route>
 

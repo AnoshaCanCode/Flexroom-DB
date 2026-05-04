@@ -1,0 +1,122 @@
+.landing-container {
+    min-height: 100vh;
+    width: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* TOPBAR: 70px height, #6a714b */
+.landing-topbar {
+    height: 70px;
+    background-color: #6a714b;
+    display: flex;
+    justify-content: flex-end; /* Push buttons to the right */
+    align-items: center;
+    padding: 0 40px;
+    width: 100%;
+}
+
+.nav-right-section {
+    display: flex;
+    gap: 20px;
+}
+
+.btn-signup {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.1rem;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.btn-login {
+    background-color: #b7b7a4; /* Tan/Login button color */
+    color: #333;
+    padding: 8px 25px;
+    border-radius: 20px;
+    border: none;
+    font-weight: bold;
+    font-size: 1.1rem;
+    cursor: pointer;
+}
+
+/* HERO SECTION */
+.hero-section {
+    text-align: center;
+    margin-top: 40px;
+}
+
+.hero-logo-img {
+    max-width: 450px;
+    height: auto;
+}
+
+.hero-tagline {
+    color: #FFFFFF; /* Requirement 4 */
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-top: 10px;
+}
+
+/* ABOUT US SECTION: Rectangle 6A714B */
+.content-wrapper {
+    display: flex;
+    justify-content: center;
+    padding: 40px 20px 120px 20px; /* Space for footer */
+}
+
+.about-container {
+    background-color: #6a714b; /* Rectangle color */
+    max-width: 900px;
+    padding: 40px;
+    border-radius: 4px; /* Slight rounding like figma */
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    text-align: center; /* Center Heading */
+}
+
+.about-heading {
+    color: #313103; /* Requirement 5: Heading Color */
+    font-size: 2.5rem;
+    margin-bottom: 25px;
+    font-weight: bold;
+}
+
+.about-text {
+    color: #F1F1F1; /* Requirement 5: Text Color */
+    line-height: 1.7;
+    text-align: justify; /* Requirement 5: Justified text */
+}
+
+.about-text p {
+    margin-bottom: 20px;
+}
+
+/* FOOTER: 70px height, #5F5F5E */
+.landing-footer {
+    height: 70px;
+    background-color: #5F5F5E; /* Requirement 3 */
+    width: 100%;
+    position: fixed;
+    bottom: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 40px;
+    color: white;
+}
+
+.footer-credits {
+    font-size: 1rem;
+    opacity: 0.9;
+}
+
+.footer-logo-img {
+    height: 45px;
+    width: auto;
+}
