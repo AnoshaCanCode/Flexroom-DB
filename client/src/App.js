@@ -129,6 +129,17 @@ function App() {
         />
 
         <Route
+          path="/student/class/:classId/assignment/:assessmentId"
+          element={(
+            <ProtectedRoute role="student">
+              <ScaledFrame>
+                <StudentPage />
+              </ScaledFrame>
+            </ProtectedRoute>
+          )}
+        />
+
+        <Route
           path="/student"
           element={(
             <ProtectedRoute role="student">

@@ -7,6 +7,17 @@ const { AuthService } = require('../server/singleton/AuthService');
 const router = express.Router();
 const auth = AuthService.getInstance();
 
+/** Same calendar-day rule as the client: deadline passes after the due date (local). */
+function isDeadlinePassed(dueDateStr, referenceDate) {
+    if (dueDateStr == null || dueDateStr === '') return false;
+    const due = new Date(dueDateStr);
+    if (Number.isNaN(due.getTime())) return false;
+    const ref = referenceDate instanceof Date ? referenceDate : new Date(referenceDate);
+    const dueDay = new Date(due.getFullYear(), due.getMonth(), due.getDate());
+    const refDay = new Date(ref.getFullYear(), ref.getMonth(), ref.getDate());
+    return refDay > dueDay;
+}
+
 /** Create Assessment (VARBINARY PDFs in SQL) */
 router.post(
     '/assessments',
@@ -101,6 +112,120 @@ router.get('/classes/:classId/assessments', auth.authorize(['student', 'evaluato
         return res.json(list.recordset);
     } catch (err) {
         console.error('classes/:classId/assessments:', err);
+        return res.status(500).json({ error: err.message });
+    }
+});
+
+/** Student: single-assignment dashboard (metadata + own submission + grade) */
+router.get('/student/assessments/:assessmentId/dashboard', auth.authorize(['student']), async (req, res) => {
+    try {
+        const assessmentId = Number(req.params.assessmentId);
+        const pool = await ConnectionManager.getInstance().getPool();
+
+        const assessResult = await pool.request()
+            .input('aid', sql.Int, assessmentId)
+            .query(`
+                SELECT 
+                    a.assessmentID,
+                    a.classID,
+                    a.title,
+                    a.type,
+                    a.marks,
+                    a.uploadingDate,
+                    a.dueDate,
+                    a.status,
+                    cc.className,
+                    cc.classCode
+                FROM Assessment a
+                INNER JOIN CourseClass cc ON cc.classID = a.classID
+                WHERE a.assessmentID = @aid
+            `);
+
+        const assessment = assessResult.recordset[0];
+        if (!assessment) {
+            return res.status(404).json({ error: 'Assessment not found' });
+        }
+
+        const enr = await pool.request()
+            .input('uid', sql.Int, req.user.userId)
+            .input('cid', sql.Int, assessment.classID)
+            .query('SELECT 1 AS ok FROM ClassEnrollment WHERE userID = @uid AND classID = @cid');
+        if (!enr.recordset.length) {
+            return res.status(403).json({ error: 'Not enrolled in this class' });
+        }
+
+        const subResult = await pool.request()
+            .input('aid', sql.Int, assessmentId)
+            .input('sid', sql.Int, req.user.userId)
+            .query(`
+                SELECT TOP 1 
+                    SubmissionID AS submissionId,
+                    FileName AS fileName,
+                    Status AS status,
+                    SubmissionDate AS submissionDate
+                FROM Submissions
+                WHERE AssignmentID = @aid AND StudentID = @sid
+                ORDER BY SubmissionDate DESC
+            `);
+
+        const gradeResult = await pool.request()
+            .input('aid', sql.Int, assessmentId)
+            .input('sid', sql.Int, req.user.userId)
+            .query(`
+                SELECT TOP 1 TotalMarks AS totalMarks, Feedback AS feedback
+                FROM Grades
+                WHERE AssessmentID = @aid AND StudentID = @sid
+                ORDER BY GradedAt DESC
+            `);
+
+        return res.json({
+            assessment,
+            submission: subResult.recordset[0] || null,
+            grade: gradeResult.recordset[0] || null,
+        });
+    } catch (err) {
+        console.error('student/assessments/:assessmentId/dashboard:', err);
+        return res.status(500).json({ error: err.message });
+    }
+});
+
+/** Student: withdraw submission only before deadline */
+router.delete('/student/submissions/:submissionId', auth.authorize(['student']), async (req, res) => {
+    try {
+        const submissionId = Number(req.params.submissionId);
+        const pool = await ConnectionManager.getInstance().getPool();
+
+        const rowResult = await pool.request()
+            .input('subId', sql.Int, submissionId)
+            .query(`
+                SELECT 
+                    s.SubmissionID,
+                    s.StudentID,
+                    s.AssignmentID,
+                    a.dueDate
+                FROM Submissions s
+                INNER JOIN Assessment a ON a.assessmentID = s.AssignmentID
+                WHERE s.SubmissionID = @subId
+            `);
+
+        const row = rowResult.recordset[0];
+        if (!row) {
+            return res.status(404).json({ error: 'Submission not found' });
+        }
+        if (row.StudentID !== req.user.userId) {
+            return res.status(403).json({ error: 'Forbidden' });
+        }
+        if (isDeadlinePassed(row.dueDate, new Date())) {
+            return res.status(403).json({ error: 'Cannot unsubmit after the deadline' });
+        }
+
+        await pool.request()
+            .input('subId', sql.Int, submissionId)
+            .query('DELETE FROM Submissions WHERE SubmissionID = @subId');
+
+        return res.json({ ok: true });
+    } catch (err) {
+        console.error('DELETE student/submissions:', err);
         return res.status(500).json({ error: err.message });
     }
 });

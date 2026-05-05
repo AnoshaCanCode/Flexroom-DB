@@ -91,6 +91,36 @@ export async function fetchSubmissionFileBlob(submissionId) {
     return res.blob();
 }
 
+export async function fetchServerTime() {
+    const res = await fetch(`${API_BASE}/api/time`);
+    if (!res.ok) throw new Error('Could not load server time');
+    return res.json();
+}
+
+/** Student assignment dashboard: assessment + own submission + grade */
+export async function fetchStudentAssignmentDashboard(assessmentId) {
+    const res = await fetch(`${API_BASE}/api/grading/student/assessments/${assessmentId}/dashboard`, {
+        headers: { ...getAuthHeader() },
+    });
+    if (!res.ok) {
+        const t = await res.text();
+        throw new Error(t || 'Could not load assignment');
+    }
+    return res.json();
+}
+
+export async function deleteStudentSubmission(submissionId) {
+    const res = await fetch(`${API_BASE}/api/grading/student/submissions/${submissionId}`, {
+        method: 'DELETE',
+        headers: { ...getAuthHeader() },
+    });
+    if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || 'Could not unsubmit');
+    }
+    return res.json();
+}
+
 export async function joinClassByCode(classCode) {
     const res = await fetch(`${API_BASE}/api/users/join-class`, {
         method: 'POST',

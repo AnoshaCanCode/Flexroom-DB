@@ -48,10 +48,11 @@ const StudentClassView = () => {
             </div>
 
             <AssignmentsList
+                classId={classId}
                 assignments={assignments}
                 loading={loading}
                 error={error}
-                onTitleDownload={handleTitleDownload}
+                onDownloadQuestion={handleTitleDownload}
             />
         </div>
     );

@@ -1,14 +1,18 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import styles from './DashboardLayout.module.css';
 
 /**
  * @param {Array<{ assessmentID: number, title: string, dueDate?: string, status?: string, marks?: number }>} assignments
+ * @param {string} [classId] When set, assignment title links to the assignment dashboard route.
+ * @param {(a: object) => void} [onDownloadQuestion] Download question PDF for a row.
  */
 function AssignmentsList({
     assignments,
     loading,
     error,
-    onTitleDownload,
+    classId,
+    onDownloadQuestion,
     gradesByAssessmentId = {},
 }) {
     if (loading) {
@@ -29,6 +33,7 @@ function AssignmentsList({
                 <tr>
                     <th>S.No#</th>
                     <th>Title</th>
+                    {classId ? <th>Question PDF</th> : null}
                     <th>Due</th>
                     <th>Status</th>
                     <th>Obtained Marks</th>
@@ -42,22 +47,47 @@ function AssignmentsList({
                         <tr key={a.assessmentID}>
                             <td>{index + 1}</td>
                             <td>
-                                <button
-                                    type="button"
-                                    className={styles.linkButton}
-                                    onClick={() => onTitleDownload(a)}
-                                >
-                                    {a.title}
-                                </button>
+                                {classId ? (
+                                    <Link
+                                        to={`/student/class/${classId}/assignment/${a.assessmentID}`}
+                                        className={styles.linkButton}
+                                    >
+                                        {a.title}
+                                    </Link>
+                                ) : (
+                                    <button
+                                        type="button"
+                                        className={styles.linkButton}
+                                        onClick={() => onDownloadQuestion?.(a)}
+                                    >
+                                        {a.title}
+                                    </button>
+                                )}
                             </td>
+                            {classId ? (
+                                <td>
+                                    <button
+                                        type="button"
+                                        className={styles.linkButton}
+                                        onClick={() => onDownloadQuestion?.(a)}
+                                    >
+                                        Download
+                                    </button>
+                                </td>
+                            ) : null}
                             <td>{a.dueDate || '—'}</td>
                             <td>
-                                <span style={{
-                                    color: a.status === 'marked' ? '#2e7d32' : '#d32f2f',
-                                    fontWeight: 600,
-                                }}
+                                <span
+                                    style={{
+                                        color: a.status === 'marked' ? '#2e7d32' : '#d32f2f',
+                                        fontWeight: 600,
+                                    }}
                                 >
-                                    {a.status === 'marked' ? 'Graded' : (a.status === 'unmarked' ? 'Open' : (a.status || 'Open'))}
+                                    {a.status === 'marked'
+                                        ? 'Graded'
+                                        : a.status === 'unmarked'
+                                          ? 'Open'
+                                          : a.status || 'Open'}
                                 </span>
                             </td>
                             <td>{g?.totalMarks != null ? g.totalMarks : '—'}</td>

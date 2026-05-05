@@ -21,6 +21,11 @@ app.use('/api/users', userRoutes);
 app.use('/api/grading', gradingRoutes);
 app.use('/api/files', fileRoutes);
 
+/** Single source of truth for deadline comparisons (ISO timestamp) */
+app.get('/api/time', (req, res) => {
+    res.json({ currentTime: new Date().toISOString() });
+});
+
 const messageLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 100,
