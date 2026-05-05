@@ -98,13 +98,13 @@ function App() {
 
         <Route path="/evaluator/class/:id" element={<EvaluatorPage />} />
         <Route path="/evaluator/evaluate/:assignmentId/:studentId" element={<EvaluationInterface />} />
-        <Route path="/student/class/:classId" element={<StudentClassView />} />
 
         {/* Student Route with Layout */}
         <Route path="/student" element={<DashboardLayout userRole="student" />}>
           <Route index element={<StudentDashboard />} />
           <Route path="settings" element={<SettingsPage />} />
           <Route path="calendar" element={<CalendarPage />} />
+          <Route path="/student/class/:classId" element={<StudentClassView />} />
         </Route>
 
         {/* Evaluator Route with Layout */}
