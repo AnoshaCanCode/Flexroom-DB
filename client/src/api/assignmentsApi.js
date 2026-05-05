@@ -121,6 +121,86 @@ export async function deleteStudentSubmission(submissionId) {
     return res.json();
 }
 
+export async function getEvaluatorMarkingContext(submissionId) {
+    const res = await fetch(`${API_BASE}/api/grading/evaluator/submissions/${submissionId}/marking-context`, {
+        headers: { ...getAuthHeader() },
+    });
+    if (!res.ok) throw new Error(await res.text());
+    return res.json();
+}
+
+export async function postPlagiarismRun(submissionId) {
+    const res = await fetch(`${API_BASE}/api/grading/plagiarism/run`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            ...getAuthHeader(),
+        },
+        body: JSON.stringify({ submissionId: Number(submissionId) }),
+    });
+    if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || 'Plagiarism run failed');
+    }
+    return res.json();
+}
+
+export async function postAutograde(submissionId) {
+    const res = await fetch(`${API_BASE}/api/grading/autograde`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            ...getAuthHeader(),
+        },
+        body: JSON.stringify({ submissionId: Number(submissionId) }),
+    });
+    if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || 'Autograde failed');
+    }
+    return res.json();
+}
+
+export async function finalizeEvaluatorGrade(payload) {
+    const res = await fetch(`${API_BASE}/api/grading/evaluator/finalize-grade`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            ...getAuthHeader(),
+        },
+        body: JSON.stringify(payload),
+    });
+    if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || 'Could not finalize grades');
+    }
+    return res.json();
+}
+
+export async function getStudentSelfEvalContext(assessmentId) {
+    const res = await fetch(`${API_BASE}/api/grading/student/assessments/${assessmentId}/self-eval-context`, {
+        headers: { ...getAuthHeader() },
+    });
+    if (!res.ok) throw new Error(await res.text());
+    return res.json();
+}
+
+export async function saveStudentSelfEval(assessmentId, body) {
+    const res = await fetch(`${API_BASE}/api/grading/student/assessments/${assessmentId}/self-eval`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            ...getAuthHeader(),
+        },
+        body: JSON.stringify(body),
+    });
+    if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || 'Could not save self evaluation');
+    }
+    return res.json();
+}
+
 export async function joinClassByCode(classCode) {
     const res = await fetch(`${API_BASE}/api/users/join-class`, {
         method: 'POST',

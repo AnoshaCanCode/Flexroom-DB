@@ -18,7 +18,8 @@ import PeoplePage from './pages/PeoplePage';
 import SubmissionPage from './pages/SubmissionPage';
 import CreateDocAssignmentPage from './pages/CreateDocAssignmentPage';
 import CreateCodeAssignmentPage from './pages/CreateCodeAssignmentPage';
-import EvaluationInterface from './components/flexroom/EvaluationInterface';
+import EvaluatorMarkingPage from './components/flexroom/EvaluatorMarkingPage';
+import { StudentSelfEvalPage } from './components/flexroom/StudentPage';
 import StudentClassView from './components/flexroom/StudentClassView';
 
 const FRAME_WIDTH = 1440;
@@ -114,7 +115,7 @@ function App() {
           path="/evaluator/evaluate/:assignmentId/:studentId"
           element={(
             <ProtectedRoute role="evaluator">
-              <EvaluationInterface />
+              <EvaluatorMarkingPage />
             </ProtectedRoute>
           )}
         />
@@ -134,6 +135,17 @@ function App() {
             <ProtectedRoute role="student">
               <ScaledFrame>
                 <StudentPage />
+              </ScaledFrame>
+            </ProtectedRoute>
+          )}
+        />
+
+        <Route
+          path="/student/class/:classId/assignment/:assessmentId/self-eval"
+          element={(
+            <ProtectedRoute role="student">
+              <ScaledFrame>
+                <StudentSelfEvalPage />
               </ScaledFrame>
             </ProtectedRoute>
           )}

@@ -142,3 +142,130 @@
   border-radius: 12px;
   font-size: 0.8rem;
 }
+
+.docFrame {
+  width: 100%;
+  min-height: 420px;
+  border: none;
+  border-radius: 6px;
+  background: #fff;
+}
+
+.linkBtn {
+  background: none;
+  border: none;
+  padding: 0;
+  color: #1565c0;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.linkBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.plagiarismBadge {
+  color: #c62828;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.plagiarismBadge strong {
+  display: block;
+  font-size: 1.25rem;
+  margin-top: 2px;
+}
+
+.plagiarismOk {
+  font-size: 0.85rem;
+  color: #555;
+}
+
+.feedbackLabel {
+  display: block;
+  margin-top: 16px;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.feedbackArea {
+  width: 100%;
+  margin-top: 6px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+.reportBox {
+  margin: 16px 24px 32px;
+  padding: 16px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.reportTitle {
+  margin: 0 0 8px;
+  font-size: 1rem;
+}
+
+.reportList {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.sideEvalHeader {
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.testCaseRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.testCaseSnippet {
+  margin: 0;
+  white-space: pre-wrap;
+  font-size: 0.85rem;
+  flex: 1;
+}
+
+.tcCircleBtn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  flex-shrink: 0;
+  font-weight: 700;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.tcCircleBtn:disabled {
+  opacity: 0.85;
+  cursor: default;
+}
+
+.tcCircleNeutral {
+  background: #e0e0e0;
+  color: #333;
+}
+
+.tcCirclePass {
+  background: #c8e6c9;
+  color: #1b5e20;
+  border-color: #2e7d32;
+}
+
+.tcCircleFail {
+  background: #ffcdd2;
+  color: #b71c1c;
+  border-color: #c62828;
+}

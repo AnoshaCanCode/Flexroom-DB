@@ -92,7 +92,7 @@ function EvaluationInterface() {
         setMarksObtained((prev) => ({ ...prev, [id]: value }));
     };
 
-    const totalMarks = baseData.rubric.reduce((sum, item) => sum + item.maxMarks, 0);
+    const rubricMaxSum = baseData.rubric.reduce((sum, item) => sum + item.maxMarks, 0);
 
     const displayName = getStoredUser()?.name || 'Evaluator';
 
@@ -132,7 +132,7 @@ function EvaluationInterface() {
                 <aside className={styles.rubricArea}>
                     <RubricPanel
                         rubric={baseData.rubric}
-                        totalMarks={totalMarks}
+                        maxAssessmentMarks={rubricMaxSum}
                         marksObtained={marksObtained}
                         onMarkChange={handleMarkChange}
                     />

@@ -19,6 +19,11 @@
   color: #4a5d4e;
 }
 
+.maxHint {
+  font-weight: 600;
+  color: #888;
+}
+
 .rubricBody {
   display: flex;
   flex-direction: column;

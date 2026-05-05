@@ -1,24 +1,23 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Link, useParams, useSearchParams } from 'react-router-dom';
-import { ArrowLeft, Send } from 'lucide-react';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
 import Layout from './Layout';
 import {
     deleteStudentSubmission,
     downloadAssessmentKey,
     fetchServerTime,
     fetchStudentAssignmentDashboard,
+    fetchSubmissionFileBlob,
+    saveStudentSelfEval,
+    getStudentSelfEvalContext,
 } from '../../api/assignmentsApi';
+import { MarkingWorkspace } from './EvaluatorMarkingPage';
+import markingStyles from './EvaluationInterface.module.css';
 import { getStoredUser } from '../auth/ProtectedRoute';
 
 const ASSIGNMENT_EXTENSIONS = /\.(txt|docx|pdf|cpp|c|h)$/i;
 const ACCEPT_INPUT =
   '.txt,.docx,.pdf,.cpp,.c,.h,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain';
-
-const RUBRIC = [
-  { id: '1', label: '1. Precision', max: 33 },
-  { id: '2', label: '2. Logic', max: 34 },
-  { id: '3', label: '3. Correct Datastructure', max: 33 },
-];
 
 function readDisplayName() {
   try {
@@ -53,18 +52,6 @@ function formatDisplayDate(isoOrStr) {
   return d.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
 }
 
-function allocateObtainedPerRubric(totalObtained, items) {
-  const maxSum = items.reduce((s, i) => s + i.max, 0);
-  if (!maxSum || totalObtained == null) return items.map(() => null);
-  let remaining = totalObtained;
-  return items.map((it, idx) => {
-    if (idx === items.length - 1) return Math.max(0, Math.round(remaining));
-    const share = Math.round((it.max / maxSum) * totalObtained);
-    remaining -= share;
-    return Math.max(0, share);
-  });
-}
-
 function CourseBanner({ courseTitle, sectionCode }) {
   return (
     <div className="fr-course-banner">
@@ -77,6 +64,7 @@ function CourseBanner({ courseTitle, sectionCode }) {
 function StudentPage({ displayName: displayNameProp } = {}) {
   const params = useParams();
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
 
   const classId = params.classId ?? searchParams.get('classId');
   const assessmentId = params.assessmentId ?? searchParams.get('assessmentId');
@@ -89,8 +77,6 @@ function StudentPage({ displayName: displayNameProp } = {}) {
   const inputRef = useRef(null);
   const [dragOver, setDragOver] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
-  const [comment, setComment] = useState('');
-
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(null);
   const [serverTimeIso, setServerTimeIso] = useState(null);
@@ -129,7 +115,6 @@ function StudentPage({ displayName: displayNameProp } = {}) {
 
   const a = dashboard?.assessment;
   const submission = dashboard?.submission;
-  const grade = dashboard?.grade;
 
   const deadlinePassed = useMemo(
     () => (a?.dueDate && serverTimeIso ? computeDeadlinePassed(a.dueDate, serverTimeIso) : false),
@@ -141,22 +126,10 @@ function StudentPage({ displayName: displayNameProp } = {}) {
   const showSelfEvaluateLink = deadlinePassed && hasSubmitted;
   const showMissingLabel = deadlinePassed && !hasSubmitted;
   const showPostDeadlineResources = deadlinePassed && hasSubmitted;
-  const showTestCasesPanel =
-    showPostDeadlineResources && a?.type && String(a.type).toLowerCase() !== 'document';
 
   const canUseDropZone = !hasSubmitted && !deadlinePassed;
   const selectAndTurnInEnabled = !hasSubmitted && !deadlinePassed;
   const unsubmitEnabled = hasSubmitted && !deadlinePassed;
-
-  const totalObtained =
-    grade?.totalMarks != null && showPostDeadlineResources && hasSubmitted
-      ? Number(grade.totalMarks)
-      : null;
-
-  const rubricObtained = useMemo(
-    () => allocateObtainedPerRubric(totalObtained, RUBRIC),
-    [totalObtained],
-  );
 
   useEffect(() => {
     if (!showPostDeadlineResources || !assessmentId) {
@@ -184,8 +157,9 @@ function StudentPage({ displayName: displayNameProp } = {}) {
   }, [showPostDeadlineResources, assessmentId]);
 
   const handleNavigateToSelfEval = useCallback(() => {
-    console.info('[FlexRoom] Self Evaluation — replace with real route when ready');
-  }, []);
+    if (!classId || !assessmentId) return;
+    navigate(`/student/class/${classId}/assignment/${assessmentId}/self-eval`);
+  }, [navigate, classId, assessmentId]);
 
   const clearInput = () => {
     const el = inputRef.current;
@@ -313,8 +287,8 @@ function StudentPage({ displayName: displayNameProp } = {}) {
           </Link>
         </div>
 
-        <div className="fr-student-layout">
-          <section className="fr-student-main flex-column">
+        <div className="fr-student-layout fr-student-layout-single">
+          <section className="fr-student-main flex-column fr-student-main-wide">
             <div className="fr-card fr-assignment-main p-4 p-lg-4">
               <header className="d-flex flex-wrap justify-content-between gap-3 border-bottom pb-4 mb-4">
                 <div className="flex-grow-1">
@@ -447,86 +421,212 @@ function StudentPage({ displayName: displayNameProp } = {}) {
               )}
             </div>
           </section>
-
-          <aside className="fr-student-sidebar">
-            <section className="fr-card border mb-3 fr-rubric-panel">
-              <div className="side-panel-header d-flex justify-content-between align-items-center">
-                <span>Rubric</span>
-                {totalObtained != null && (
-                  <span className="small fw-normal">Total: {totalObtained}</span>
-                )}
-              </div>
-              <ul className="list-unstyled mb-0 p-3" style={{ background: '#f5f6f3' }}>
-                {RUBRIC.map((item, idx) => {
-                  const obtained = rubricObtained[idx];
-                  const showObtained =
-                    totalObtained != null && showPostDeadlineResources && hasSubmitted;
-                  return (
-                    <li key={item.id} className="d-flex gap-2 py-3 border-bottom">
-                      <div
-                        className="rounded-circle d-flex align-items-center justify-content-center text-white"
-                        style={{
-                          width: 44,
-                          height: 44,
-                          background: '#7d8b63',
-                          fontSize: 12,
-                          fontWeight: 700,
-                        }}
-                      >
-                        +{item.max}
-                      </div>
-                      <div>
-                        <p className="mb-2" style={{ color: '#2a2d26' }}>
-                          {item.label}
-                        </p>
-                        <p className="mb-0 small fr-muted">
-                          Obtained:{' '}
-                          {showObtained && obtained != null ? `+${obtained}` : '_____'}
-                        </p>
-                      </div>
-                    </li>
-                  );
-                })}
-              </ul>
-            </section>
-
-            <section className="fr-card border fr-comment-panel mb-3">
-              <div className="side-panel-header">Private Comments</div>
-              <div className="p-2" style={{ background: '#f0f1ed' }}>
-                <label className="visually-hidden" htmlFor="student-private-comment">
-                  Private comment
-                </label>
-                <div
-                  className="d-flex gap-2 rounded border px-2 py-1"
-                  style={{ background: '#ebece8', borderColor: '#d8dcd3' }}
-                >
-                  <input
-                    id="student-private-comment"
-                    type="text"
-                    placeholder="Add comment..."
-                    value={comment}
-                    onChange={(e) => setComment(e.target.value)}
-                    className="form-control border-0 bg-transparent shadow-none p-1"
-                  />
-                  <button type="button" aria-label="Send comment" className="btn btn-sm">
-                    <Send size={18} />
-                  </button>
-                </div>
-              </div>
-            </section>
-
-            {showTestCasesPanel && (
-              <section className="fr-card border fr-test-cases-sidebar">
-                <div className="side-panel-header">Test Cases</div>
-                <pre className="fr-test-cases-snippet">
-                  {`x = 3,
-y = -2`}
-                </pre>
-              </section>
-            )}
-          </aside>
         </div>
       </div>
+    </Layout>
+  );
+}
+
+/** Full-screen self evaluation (after deadline). Routed from assignment page. */
+export function StudentSelfEvalPage() {
+  const params = useParams();
+  const navigate = useNavigate();
+  const classId = params.classId;
+  const assessmentId = params.assessmentId;
+  const resolvedName = readDisplayName();
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [ctx, setCtx] = useState(null);
+  const [docUrls, setDocUrls] = useState({ submission: null, key: null });
+  const [marksObtained, setMarksObtained] = useState({});
+  const [testStates, setTestStates] = useState({});
+  const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    if (!assessmentId) return undefined;
+    let cancelled = false;
+    (async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const data = await getStudentSelfEvalContext(Number(assessmentId));
+        if (cancelled) return;
+        setCtx(data);
+        const init = {};
+        (data.rubric || []).forEach((r) => {
+          const saved = data.savedSelfEval?.rubricScores?.[r.id];
+          init[r.id] = saved != null && saved !== '' ? String(saved) : '';
+        });
+        setMarksObtained(init);
+        const tcInit = {};
+        (data.testCases || []).forEach((tc, i) => {
+          const key = tc.id != null ? String(tc.id) : String(i);
+          const raw = data.savedSelfEval?.testCaseScores?.[key];
+          if (raw === true || raw === false) tcInit[key] = raw;
+        });
+        setTestStates(tcInit);
+      } catch (e) {
+        if (!cancelled) setError(e.message || 'Could not load self evaluation');
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [assessmentId]);
+
+  const submissionId = ctx?.submission?.submissionId;
+
+  const isDocPresentation =
+    ctx &&
+    (String(ctx.assessment?.type).toLowerCase() === 'document' ||
+      /\.pdf$/i.test(ctx.submission?.fileName || ''));
+
+  useEffect(() => {
+    if (!ctx || !submissionId || !isDocPresentation) return undefined;
+    let subUrl;
+    let keyUrl;
+    let cancelled = false;
+    (async () => {
+      try {
+        const sb = await fetchSubmissionFileBlob(submissionId);
+        const kb = await downloadAssessmentKey(ctx.assessment.assessmentID);
+        if (cancelled) return;
+        subUrl = URL.createObjectURL(sb);
+        keyUrl = URL.createObjectURL(kb);
+        setDocUrls({ submission: subUrl, key: keyUrl });
+      } catch (e) {
+        if (!cancelled) setError(e.message || 'Could not load PDF viewers');
+      }
+    })();
+    return () => {
+      cancelled = true;
+      if (subUrl) URL.revokeObjectURL(subUrl);
+      if (keyUrl) URL.revokeObjectURL(keyUrl);
+    };
+  }, [ctx, submissionId, isDocPresentation]);
+
+  const toggleTest = useCallback((key) => {
+    setTestStates((prev) => {
+      const cur = prev[key];
+      const next =
+        cur === undefined ? true : cur === true ? false : undefined;
+      return { ...prev, [key]: next };
+    });
+  }, []);
+
+  const handleMarkChange = useCallback((id, value) => {
+    setMarksObtained((prev) => ({ ...prev, [id]: value }));
+  }, []);
+
+  const sumMarks = useMemo(() => {
+    if (!ctx?.rubric) return 0;
+    return ctx.rubric.reduce((s, item) => {
+      const v = Number(marksObtained[item.id]);
+      return s + (Number.isFinite(v) ? v : 0);
+    }, 0);
+  }, [ctx, marksObtained]);
+
+  const saveEval = async () => {
+    if (!assessmentId) return;
+    setBusy(true);
+    try {
+      const tcPayload = {};
+      Object.entries(testStates).forEach(([k, v]) => {
+        if (v === true || v === false) tcPayload[k] = v;
+      });
+      await saveStudentSelfEval(Number(assessmentId), {
+        rubricMarks: marksObtained,
+        testCaseResults: tcPayload,
+        totalMarks: sumMarks,
+      });
+      alert('Self evaluation saved.');
+    } catch (e) {
+      alert(e.message || 'Save failed');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  if (!assessmentId || !classId) {
+    return (
+      <Layout sidebarVariant="student" displayName={resolvedName}>
+        <div className="p-4">Invalid route.</div>
+      </Layout>
+    );
+  }
+
+  if (loading) {
+    return (
+      <Layout sidebarVariant="student" displayName={resolvedName}>
+        <div className="p-4">Loading self evaluation…</div>
+      </Layout>
+    );
+  }
+
+  if (error || !ctx) {
+    return (
+      <Layout sidebarVariant="student" displayName={resolvedName}>
+        <div className="p-4">
+          <p className="text-danger">{error || 'Unavailable.'}</p>
+          <button type="button" className="btn btn-link p-0" onClick={() => navigate(-1)}>
+            Go back
+          </button>
+        </div>
+      </Layout>
+    );
+  }
+
+  const footer = (
+    <button
+      type="button"
+      className={markingStyles.submitMarksBtn}
+      disabled={busy}
+      onClick={saveEval}
+    >
+      Save Evaluation
+    </button>
+  );
+
+  return (
+    <Layout sidebarVariant="student" displayName={resolvedName}>
+      <button
+        type="button"
+        className="text-dark px-3 pt-3 d-inline-block btn btn-link text-decoration-none"
+        onClick={() => navigate(`/student/class/${classId}/assignment/${assessmentId}`)}
+      >
+        ← Back to assignment
+      </button>
+
+      <MarkingWorkspace
+        panelTitle="Self Evaluate"
+        courseTitle={ctx.assessment.className || 'Course'}
+        sectionLabel={String(ctx.assessment.classCode ?? '')}
+        assignmentTitle={ctx.assessment.title}
+        isDocumentPresentation={Boolean(isDocPresentation)}
+        submissionCodeOrPlaceholder={
+          ctx.submission.sourceText?.trim()
+            ? ctx.submission.sourceText
+            : '(No textual submission)'
+        }
+        keyCodeOrPlaceholder={
+          ctx.keyText?.trim() ? ctx.keyText : '(No key text stored)'
+        }
+        submissionPdfUrl={docUrls.submission}
+        keyPdfUrl={docUrls.key}
+        rubric={ctx.rubric}
+        testCases={ctx.testCases}
+        marksObtained={marksObtained}
+        onMarkChange={handleMarkChange}
+        testStates={testStates}
+        onToggleTestCase={toggleTest}
+        readOnlyTestToggles={false}
+        maxAssessmentMarks={ctx.assessment.marks}
+        headerActions={null}
+        footerActions={footer}
+      />
     </Layout>
   );
 }
