@@ -1,4 +1,5 @@
-const db = require('../config/db'); // Your SQL Connection
+const config = require('../dbconfig'); // Your SQL Connection
+/*const db = require('../config/db');*/ 
 
 const FileController = {
     // Shared Logic for Evaluators and Students

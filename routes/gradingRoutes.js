@@ -1,3 +1,7 @@
+const express = require('express');
+const router = express.Router();
+const multer = require('multer'); // <--- ADD THIS
+const upload = multer({ dest: 'uploads/' });
 /** 1. Create Assessment (Saves to SQL + Handles PDF Files) */
 // CHANGE: Removed express.json() and added upload.fields to capture PDFs
 router.post('/assessments', upload.fields([
@@ -48,3 +52,5 @@ router.post('/assessments', upload.fields([
     return res.status(500).json({ error: err.message });
   }
 });
+
+module.exports = router;

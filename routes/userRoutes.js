@@ -53,4 +53,17 @@ router.get('/generate-code', auth.authorize(['evaluator']), (req, res) => {
     res.json({ code });
 });
 
+/** [BACK-USER-00]: Signup */
+router.post('/signup', async (req, res) => {
+    try {
+        const { name, email, password, role } = req.body;
+        
+        // We need to call a signup method in your AuthService
+        const data = await auth.signup(name, email, password, role); 
+        res.json({ success: true, data });
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+});
+
 module.exports = router;

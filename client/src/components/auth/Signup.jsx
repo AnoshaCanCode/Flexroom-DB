@@ -11,30 +11,38 @@ const Signup = () => {
     const [password, setPassword] = useState('');
     const [userRole, setUserRole] = useState('');
 
-    const handleSignup = (e) => {
+    const handleSignup = async (e) => {
     e.preventDefault(); 
     
-    // 2. Validation
-    if (!name.trim() || !email.trim() || !password.trim()) {
-        alert('Please fill in name, email, and password first.');
-        return;
-    }
-    if (!userRole) {
-        alert('Please choose whether you are signing up as a Student or Evaluator.');
+    if (!name.trim() || !email.trim() || !password.trim() || !userRole) {
+        alert('Please fill in all fields and select a role.');
         return;
     }
 
     try {
-        window.localStorage.setItem('flexroomDisplayName', name.trim());
-        if (userRole === 'evaluator') {
-            window.localStorage.setItem('flexroomDisplayNameEvaluator', name.trim());
-        }
-    } catch (_) {
-        // ignore storage issues in local preview
-    }
+        const response = await fetch('http://localhost:5000/api/users/signup', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                name: name.trim(), 
+                email: email.trim(), 
+                password: password, 
+                role: userRole 
+            }) 
+        });
 
-    // 3. Use the userRole state variable directly
-    navigate(userRole === 'student' ? '/student' : '/evaluator');
+        const data = await response.json();
+
+        if (response.ok) {
+            alert("Signup successful! Please log in.");
+            navigate('/login');
+        } else {
+            alert(data.message || "Signup failed");
+        }
+    } catch (error) {
+        console.error("Signup error:", error);
+        alert("Server connection failed. Check if backend is running on port 5000.");
+    }
 };
 
     return (

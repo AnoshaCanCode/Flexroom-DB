@@ -39,6 +39,23 @@ class AuthService {
         return { token, user: { id: user.UserID, name: user.Name, role: user.UserRole } };
     }
 
+    async signup(name, email, password, role) {
+    const pool = await ConnectionManager.getInstance().getPool();
+    
+    // 1. Hash the password before saving it!
+    const hashedPassword = await this.hashPassword(password);
+
+    // 2. Use the hashedPassword in your query
+    await pool.request()
+        .input('name', sql.NVarChar, name)
+        .input('email', sql.NVarChar, email)
+        .input('password', sql.NVarChar, hashedPassword) // Use hashed here
+        .input('role', sql.NVarChar, role)
+        .query('INSERT INTO Users (Name, Email, Password, UserRole) VALUES (@name, @email, @password, @role)');
+    
+    return { message: "User created" };
+}
+
     /** Middleware: Verify JWT and Role */
     authorize(roles = []) {
         return (req, res, next) => {

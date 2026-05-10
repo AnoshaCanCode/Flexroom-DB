@@ -14,38 +14,31 @@ const Login = () => {
     const [userRole, setUserRole] = useState(''); // Stores 'student' or 'evaluator'
 
     //when the user tries to log in:
-    const handleLogin = (e, nextRole = userRole) => {
-        e.preventDefault(); //prevents page from reloading
-        
-        //capture data
-        console.log("LOGIN ATTEMPT:");
-        console.log("Email:", email);
-        console.log("Password:", password);
-        console.log("Attempting to Login As:", nextRole);
+    const handleLogin = async (e, selectedRole) => {
+    e.preventDefault();
+    
+    try {
+        const response = await fetch('http://localhost:5000/api/users/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            // Send the role to the backend if your stored procedure requires it
+            body: JSON.stringify({ email, password, role: selectedRole }) 
+        });
 
-        if (!nextRole) {
-            alert("Please select if you are logging in as a Student or Evaluator.");
-            return;
+        const data = await response.json();
+
+        if (response.ok) {
+            localStorage.setItem('user', JSON.stringify(data.user));
+            // Navigate based on the role returned by the server
+            navigate(data.user.role === 'student' ? '/student' : '/evaluator');
+        } else {
+            alert(data.message || "Login failed");
         }
-
-        try {
-            const rememberedName = window.localStorage.getItem(
-                nextRole === 'student' ? 'flexroomDisplayName' : 'flexroomDisplayNameEvaluator'
-            );
-            if (!rememberedName && nextRole === 'student') {
-                window.localStorage.setItem('flexroomDisplayName', 'Apple');
-            }
-            if (!rememberedName && nextRole === 'evaluator') {
-                window.localStorage.setItem('flexroomDisplayNameEvaluator', 'Hayyan');
-            }
-        } catch (_) {
-            // ignore storage issues in local preview
-        }
-
-        // --- WHERE THE BACKEND VERIFICATION CALL WILL GO LATER ---
-        // (Next Victory: fetch('/api/login', { method: 'POST', ... }))
-        navigate(nextRole === 'student' ? '/student' : '/evaluator');
-    };
+    } catch (error) {
+        console.error("Fetch error:", error);
+        alert("Server connection failed. Check if backend is running on port 5000.");
+    }
+};
 
     return (
         <div className="container-fluid d-flex justify-content-center align-items-center auth-background vh-100">

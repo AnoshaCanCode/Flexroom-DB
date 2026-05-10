@@ -9,15 +9,22 @@ const DashboardLayout = ({ userRole }) => {
     const [courseHeader, setCourseHeader] = useState({ title: null, code: null });
 
     const displayName = useMemo(() => {
-        try {
-            if (userRole === 'evaluator') {
-                return window.localStorage.getItem('flexroomDisplayNameEvaluator') || 'Rida Amir';
-            }
-            return window.localStorage.getItem('flexroomDisplayName') || 'Apple';
-        } catch {
-            return userRole === 'evaluator' ? 'Rida Amir' : 'Apple';
+    try {
+        // 1. Get the main 'user' object we saved at login
+        const savedUser = window.localStorage.getItem('user');
+        
+        if (savedUser) {
+            const parsed = JSON.parse(savedUser);
+            // 2. Return the name from that object
+            return parsed.name || 'User';
         }
-    }, [userRole]);
+        
+        // 3. Keep your role-based fallbacks just in case
+        return userRole === 'evaluator' ? 'Rida Amir' : 'Student';
+    } catch {
+        return 'User';
+    }
+}, [userRole]);
 
     return (
         <div className={styles.layoutContainer}>
