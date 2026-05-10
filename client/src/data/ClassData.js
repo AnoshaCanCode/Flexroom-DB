@@ -36,7 +36,7 @@ export const classList = [
         evaluatorName: "Uzair Naqvi"
     },
     {
-        id: 5,
+        id: 6,
         title: "Data Structures Lab",
         evaluatorName: "Muhammad Kamran"
     },

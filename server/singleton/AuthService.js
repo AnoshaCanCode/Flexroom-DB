@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { ConnectionManager } = require('./ConnectionManager');
 const sql = require('mssql');
+const userDAL = require('../dal/UserDAL'); // Import the new DAL
 
 class AuthService {
     static #instance = null;
@@ -16,44 +17,34 @@ class AuthService {
         return await bcrypt.hash(password, 10);
     }
 
+    //AuthService.js handles the logic (hashing and JWTs) but leaves the SQL work to the DAL
     /** Login & Generate JWT */
-    async login(email, password) {
-        const pool = await ConnectionManager.getInstance().getPool();
-        const result = await pool.request()
-            .input('email', sql.NVarChar, email)
-            .query('SELECT * FROM Users WHERE Email = @email');
-
-        const user = result.recordset[0];
-        if (!user) throw new Error('User not found');
-
-        const isMatch = await bcrypt.compare(password, user.Password);
-        if (!isMatch) throw new Error('Invalid credentials');
-
-        // Sign the token with their Role
-        const token = jwt.sign(
-            { userId: user.UserID, role: user.UserRole, name: user.Name },
-            process.env.JWT_SECRET,
-            { expiresIn: '1d' }
-        );
-
-        return { token, user: { id: user.UserID, name: user.Name, role: user.UserRole } };
-    }
-
     async signup(name, email, password, role) {
-    const pool = await ConnectionManager.getInstance().getPool();
-    
-    // 1. Hash the password before saving it!
+    // 1. Business Logic: Hash the password
     const hashedPassword = await this.hashPassword(password);
 
-    // 2. Use the hashedPassword in your query
-    await pool.request()
-        .input('name', sql.NVarChar, name)
-        .input('email', sql.NVarChar, email)
-        .input('password', sql.NVarChar, hashedPassword) // Use hashed here
-        .input('role', sql.NVarChar, role)
-        .query('INSERT INTO Users (Name, Email, Password, UserRole) VALUES (@name, @email, @password, @role)');
+    // 2. Data Access: Save to DB via DAL
+    await userDAL.createUser(name, email, hashedPassword, role);
     
-    return { message: "User created" };
+    return { message: "User created successfully" };
+}
+
+async login(email, password) {
+    // 1. Data Access: Get the user
+    const user = await userDAL.getUserByEmail(email);
+    if (!user) throw new Error('User not found');
+
+    // 2. Business Logic: Verify password & generate token
+    const isMatch = await bcrypt.compare(password, user.Password);
+    if (!isMatch) throw new Error('Invalid credentials');
+
+    const token = jwt.sign(
+        { userId: user.UserID, role: user.UserRole, name: user.Name },
+        process.env.JWT_SECRET,
+        { expiresIn: '1d' }
+    );
+
+    return { token, user: { id: user.UserID, name: user.Name, role: user.UserRole } };
 }
 
     /** Middleware: Verify JWT and Role */
