@@ -11,8 +11,7 @@ const fileRoutes = require('./routes/fileRoutes');
 // ... other middleware like app.use(express.json()) ...
 
 const app = express();
-const PORT = 5000;
-
+const PORT = process.env.PORT || 5000;
 // Middleware
 // Standard JSON parser for simple requests
 app.use(require('cors')()) // This allows the frontend to talk to the backend
@@ -48,7 +47,6 @@ app.get('/api/message', messageLimiter, async (req, res) => {
     }
     res.json(responseData);
 });
-
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });

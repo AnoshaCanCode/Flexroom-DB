@@ -1,29 +1,69 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ClassCard from '../components/ClassCard';
 import styles from '../components/DashboardLayout.module.css';
-import { evaluatorClassList } from '../data/EvaluatorClassData';
 
 const EvaluatorDashboard = () => {
     const navigate = useNavigate();
+    const [classes, setClasses] = useState([]); // State for DB data
     const [showModal, setShowModal] = useState(false);
-    
-    // New states for the Create Class form
     const [classTitle, setClassTitle] = useState('');
-    const [section, setSection] = useState('');
+    const [section, setSection] = useState(''); // Note: Section isn't in your SQL schema yet, we'll combine it with Title
 
-    const handleCreateClass = () => {
-        console.log("Creating:", classTitle, section);
-        setShowModal(false);
+    // Fetch classes from DB on load
+    const fetchClasses = async () => {
+        try {
+            const response = await fetch('http://localhost:5000/api/users/classes');
+            const data = await response.json();
+            
+            // Safety Check: Only set state if data is an array
+            if (Array.isArray(data)) {
+                setClasses(data);
+            } else {
+                console.error("Received non-array data:", data);
+                setClasses([]); // Fallback to empty array
+            }
+        } catch (error) {
+            console.error("Fetch error:", error);
+            setClasses([]); 
+        }
+    };
+
+    useEffect(() => {
+        fetchClasses();
+    }, []);
+
+    const handleCreateClass = async () => {
+        if (!classTitle) return alert("Please enter a title");
+
+        try {
+            const token = sessionStorage.getItem('flexroom_token');
+            const response = await fetch('http://localhost:5000/api/users/create-class', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ className: `${classTitle} (${section})` })
+            });
+
+            if (response.ok) {
+                alert("Class Created Successfully!");
+                setShowModal(false);
+                setClassTitle('');
+                setSection('');
+                fetchClasses(); // Refresh list automatically
+            }
+        } catch (error) {
+            alert("Failed to create class.");
+        }
     };
 
     return (
         <div className={styles.dashboardContainer}>
             <div className={styles.headerRow}>
                 <h1 className={styles.title}>Evaluated Classes</h1>
-                <button className={styles.addButton} onClick={() => setShowModal(true)}>
-                    +
-                </button>
+                <button className={styles.addButton} onClick={() => setShowModal(true)}>+</button>
             </div>
 
             {showModal && (
@@ -32,7 +72,7 @@ const EvaluatorDashboard = () => {
                         <h2>Create New Class</h2>
                         <input 
                             type="text" 
-                            placeholder="Class Title" 
+                            placeholder="Class Title (e.g. OS)" 
                             className={styles.modalInput}
                             value={classTitle}
                             onChange={(e) => setClassTitle(e.target.value)}
@@ -53,22 +93,21 @@ const EvaluatorDashboard = () => {
             )}
 
             <div className={styles.grid}>
-                {evaluatorClassList.map((cls) => (
+                {classes.map((cls) => (
                     <div 
-                        key={cls.id} 
-                        onClick={() => navigate(`/evaluator/class/${cls.id}`)} 
+                        key={cls.classID} 
+                        onClick={() => navigate(`/evaluator/class/${cls.classID}`)} 
                         style={{ cursor: 'pointer' }}
                     >
                         <ClassCard 
                             role="evaluator"
-                            title={cls.title} 
-                            section={cls.section}
-                            assignments={cls.assignments}
+                            title={cls.className} 
+                            section={`Code: ${cls.classCode}`} // Displaying the join code here
+                            assignments={[]} // Assignments will be fetched in Phase 4
                         />
                     </div>
                 ))}
             </div>
-            {/* The buttons were removed from here */}
         </div>
     );
 };

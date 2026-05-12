@@ -11,13 +11,13 @@ CREATE TABLE Users (
 );
 GO
 
-INSERT INTO Users (Name, Email, Password, UserRole)
+"""INSERT INTO Users (Name, Email, Password, UserRole)
 VALUES 
 ('Anosha Asher', 'anoshaasher@gmail.com', 'TeamLead2026!', 'evaluator'),
 ('Muhammad Ibrahim', 'mibrahim@gmail.com', 'LogicPass123', 'student'),
 ('Amal Fazeel', 'amalfazeel@gmail.com', 'AmalSecure456', 'student'),
 ('Dr. Smith', 'dr.smith@gmail.com', 'ProfessorPass!', 'evaluator'),
-('John Doe', 'johndoe.test@gmail.com', 'StudentPass789', 'student');
+('John Doe', 'johndoe.test@gmail.com', 'StudentPass789', 'student');"""
 
 SELECT * FROM Users;
 
@@ -36,7 +36,7 @@ CREATE TABLE EvaluatorProfiles (
 );
 GO
 
-INSERT INTO StudentProfiles (UserID, EducationLevel, EducationYear) 
+"""INSERT INTO StudentProfiles (UserID, EducationLevel, EducationYear) 
 VALUES 
 (2, 'graduate', 2),
 (3, 'graduate', 3),
@@ -45,13 +45,13 @@ VALUES
 INSERT INTO EvaluatorProfiles (UserID) 
 VALUES 
 (1),
-(4);
+(4);"""
 
 SELECT * FROM StudentProfiles;
 SELECT * FROM EvaluatorProfiles;
 
 CREATE TABLE CourseClass (
-    classID INT PRIMARY KEY,
+    classID INT PRIMARY KEY IDENTITY(1,1) NOT NULL,--CHANGE!! ADD IDENTITY
     courseID INT NOT NULL DEFAULT 0,
     className NVARCHAR(100) NOT NULL,
     classCode INT NOT NULL UNIQUE,
@@ -59,13 +59,13 @@ CREATE TABLE CourseClass (
     numStudents INT DEFAULT 0
 );
 
-INSERT INTO CourseClass (classID, courseID, className, classCode, generatedDate, numStudents)
+"""INSERT INTO CourseClass (classID, courseID, className, classCode, generatedDate, numStudents)
 VALUES
     (1, 1, 'OOP-A', 3011, '2025-01-10', 35),
     (2, 1, 'OOP-B', 3012, '2025-01-10', 30),
     (3, 2, 'DB-A', 3511, '2025-01-12', 40),
     (4, 3, 'SE-A', 4711, '2025-08-15', 38),
-    (5, 4, 'DS-A', 2011, '2025-08-15', 42);
+    (5, 4, 'DS-A', 2011, '2025-08-15', 42);"""
 
 CREATE TABLE Assessment (
     assessmentID INT PRIMARY KEY,
@@ -79,7 +79,7 @@ CREATE TABLE Assessment (
     status NVARCHAR(20) DEFAULT 'unmarked'
 );
 
-INSERT INTO Assessment
+"""INSERT INTO Assessment
     (assessmentID, classID, title, type, marks, uploadingDate, dueDate, status)
 VALUES
     (1, 1, 'Lab 1 – Inheritance Report', 'document', 10, '2025-02-20', '2025-03-10', 'marked'),
@@ -87,7 +87,7 @@ VALUES
     (3, 3, 'Quiz 1 – ER Diagrams', 'bubble', 5, '2025-02-25', '2025-02-28', 'marked'),
     (4, 4, 'Assignment 1 – SRS Document', 'document', 25, '2025-03-20', '2025-04-05', 'unmarked'),
     (5, 5, 'Lab 3 – BST Implementation', 'code', 15, '2025-09-01', NULL, 'unmarked'),
-    (6, 5, 'Mid Exam – Data Structures', 'document', 50, '2025-10-01', '2025-10-15', 'unmarked');
+    (6, 5, 'Mid Exam – Data Structures', 'document', 50, '2025-10-01', '2025-10-15', 'unmarked');"""
 
     SELECT * FROM CourseClass;
     SELECT * FROM Assessment;
@@ -122,14 +122,14 @@ CREATE TABLE MatchResults (
         REFERENCES Submissions(SubmissionID)
 );
 
-INSERT INTO Submissions (AssignmentID, StudentID, FileName, FileContent, Status)
+"""INSERT INTO Submissions (AssignmentID, StudentID, FileName, FileContent, Status)
 VALUES ( 6, 2, 'lab1_logic.cpp', CAST('int main() { return 0; }' AS VARBINARY(MAX)), 'On-Time');
 
 INSERT INTO Submissions ( AssignmentID, StudentID, FileName, FileContent, Status)
 VALUES (6, 3, 'lab1_final.cpp', CAST('int main() { return 0; }' AS VARBINARY(MAX)), 'On-Time');
 
 INSERT INTO MatchResults (TargetSubmissionID, SourceSubmissionID, SimilarityPercentage)
-VALUES (2, 1, 95.50);
+VALUES (2, 1, 95.50);"""
 
 Select * from Submissions
 select * from MatchResults
@@ -143,11 +143,11 @@ CREATE TABLE TestCases (
     FOREIGN KEY (AssessmentID) REFERENCES Assessment(assessmentID) ON DELETE CASCADE
 );
 
--- Sample Data for Assessment 2 (Linked List - Code Type)
+"""-- Sample Data for Assessment 2 (Linked List - Code Type)
 INSERT INTO TestCases (AssessmentID, Input, ExpectedOutput, Marks)
 VALUES 
 (2, '5 10 15', '15 10 5', 10), -- Test Case 1: Reverse logic
-(2, '1', '1', 10);              -- Test Case 2: Single node
+(2, '1', '1', 10);              -- Test Case 2: Single node"""
 
 
 CREATE TABLE Grades (
@@ -216,6 +216,6 @@ GO
 
 -- Updating Anosha's test account with a pre-hashed Bcrypt string
 -- Original password: Password123!
-UPDATE Users 
+"""UPDATE Users 
 SET Password = '$2b$10$76YmH9tY5.y6m.u8i2l6e.U1ZqZ9oF9W5qV9Yt6W5qV9Yt6W5qV9Y' 
-WHERE Email = 'anoshaasher@gmail.com';
+WHERE Email = 'anoshaasher@gmail.com';"""

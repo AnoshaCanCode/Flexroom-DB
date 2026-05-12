@@ -1,4 +1,3 @@
-//This file's only job is to execute the Stored Procedures we just made
 const { ConnectionManager } = require('../singleton/ConnectionManager');
 const sql = require('mssql');
 
@@ -14,13 +13,44 @@ class UserDAL {
             .execute('sp_SignupUser'); 
     }
 
-    /** Calls sp_LoginUser or fetches user by email for AuthService to verify */
+    /** Fetches user by email for AuthService to verify */
     async getUserByEmail(email) {
         const pool = await ConnectionManager.getInstance().getPool();
         const result = await pool.request()
             .input('email', sql.NVarChar, email)
-            .query('SELECT * FROM Users WHERE Email = @email'); // Or use a proc if you prefer
+            .query('SELECT * FROM Users WHERE Email = @email');
         return result.recordset[0];
+    }
+
+    /** Create a new class in the DB (Mapping to your IDENTITY(1,1) schema) */
+    async createClass(className, classCode, date) {
+        try {
+            const pool = await ConnectionManager.getInstance().getPool();
+            
+            return await pool.request()
+                .input('className', sql.NVarChar, className)
+                .input('classCode', sql.Int, classCode)
+                .input('genDate', sql.NVarChar, date)
+                .query(`
+                    INSERT INTO CourseClass (className, classCode, generatedDate, numStudents) 
+                    VALUES (@className, @classCode, @genDate, 0)
+                `);
+        } catch (err) {
+            console.error("SQL Error in createClass:", err.message);
+            throw err;
+        }
+    }
+
+    /** Fetch all classes */
+    async getAllClasses() {
+        try {
+            const pool = await ConnectionManager.getInstance().getPool();
+            const result = await pool.request().query('SELECT * FROM CourseClass');
+            return result.recordset;
+        } catch (err) {
+            console.error("SQL Error in getAllClasses:", err.message);
+            throw err;
+        }
     }
 }
 

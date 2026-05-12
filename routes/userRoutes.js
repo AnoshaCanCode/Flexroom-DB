@@ -1,8 +1,11 @@
 const express = require('express');
 const crypto = require('crypto');
-const { AuthService } = require('../server/singleton/AuthService');
-const { ConnectionManager } = require('../server/singleton/ConnectionManager');
 const sql = require('mssql');
+
+// PATH ADJUSTMENTS BASED ON YOUR FOLDER TREE:
+const { AuthService } = require('../server/singleton/AuthService'); 
+const { ConnectionManager } = require('../server/singleton/ConnectionManager'); 
+const userDAL = require('../server/dal/UserDAL'); 
 
 const router = express.Router();
 const auth = AuthService.getInstance();
@@ -24,7 +27,6 @@ router.post('/join-class', auth.authorize(['student']), async (req, res) => {
         const { classCode } = req.body;
         const pool = await ConnectionManager.getInstance().getPool();
 
-        // 1. Find the class by the 4-digit code (per your schema.sql)
         const classResult = await pool.request()
             .input('code', sql.Int, classCode)
             .query('SELECT classID FROM CourseClass WHERE classCode = @code');
@@ -35,8 +37,6 @@ router.post('/join-class', auth.authorize(['student']), async (req, res) => {
 
         const classId = classResult.recordset[0].classID;
 
-        // 2. Logic: In your schema, CourseClass has 'numStudents'. 
-        // We update the count and you might want a junction table 'ClassEnrollments' later.
         await pool.request()
             .input('cid', sql.Int, classId)
             .query('UPDATE CourseClass SET numStudents = numStudents + 1 WHERE classID = @cid');
@@ -47,23 +47,44 @@ router.post('/join-class', auth.authorize(['student']), async (req, res) => {
     }
 });
 
-/** Extra: 6-digit Code Generator for Evaluators creating classes */
-router.get('/generate-code', auth.authorize(['evaluator']), (req, res) => {
-    const code = Math.floor(100000 + Math.random() * 900000); // 6-digit
-    res.json({ code });
-});
-
 /** [BACK-USER-00]: Signup */
 router.post('/signup', async (req, res) => {
     try {
         const { name, email, password, role } = req.body;
-        
-        // We need to call a signup method in your AuthService
         const data = await auth.signup(name, email, password, role); 
         res.json({ success: true, data });
     } catch (err) {
         res.status(400).json({ error: err.message });
     }
+});
+
+/** Create a New Class */
+router.post('/create-class', auth.authorize(['evaluator']), async (req, res) => {
+    try {
+        const { className } = req.body;
+        const classCode = Math.floor(1000 + Math.random() * 9000);
+        const today = new Date().toLocaleDateString();
+
+        await userDAL.createClass(className, classCode, today);
+        res.json({ success: true, classCode, className });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+/** Fetch Classes for Dashboard */
+router.get('/classes', async (req, res) => {
+    try {
+        const classes = await userDAL.getAllClasses();
+        res.json(classes || []); 
+    } catch (err) {
+        console.error("Route Error /classes:", err.message);
+        res.status(500).json({ error: "Failed to fetch classes" });
+    }
+});
+
+router.get('/test', (req, res) => {
+    res.send("User routes are working!");
 });
 
 module.exports = router;
