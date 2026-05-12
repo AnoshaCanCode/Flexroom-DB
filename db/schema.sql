@@ -51,7 +51,7 @@ SELECT * FROM StudentProfiles;
 SELECT * FROM EvaluatorProfiles;
 
 CREATE TABLE CourseClass (
-    classID INT PRIMARY KEY IDENTITY(1,1) NOT NULL,--CHANGE!! ADD IDENTITY
+    classID INT PRIMARY KEY IDENTITY(1,1) NOT NULL,--UPDATED!! ADD IDENTITY
     courseID INT NOT NULL DEFAULT 0,
     className NVARCHAR(100) NOT NULL,
     classCode INT NOT NULL UNIQUE,
@@ -66,6 +66,26 @@ VALUES
     (3, 2, 'DB-A', 3511, '2025-01-12', 40),
     (4, 3, 'SE-A', 4711, '2025-08-15', 38),
     (5, 4, 'DS-A', 2011, '2025-08-15', 42);"""
+
+CREATE TABLE StudentClasses (--UPDATED!!
+    enrollmentID INT PRIMARY KEY IDENTITY(1,1),
+    
+    -- Link to the Student (User)
+    userID INT NOT NULL, 
+    
+    -- Link to the Class
+    classID INT NOT NULL,
+    
+    -- Metadata
+    enrollmentDate DATETIME DEFAULT GETDATE(),
+
+    -- Constraints for 3NF and Data Integrity
+    CONSTRAINT FK_Student FOREIGN KEY (userID) REFERENCES Users(userID),
+    CONSTRAINT FK_Class FOREIGN KEY (classID) REFERENCES CourseClass(classID),
+    
+    -- Prevents a student from joining the SAME class twice
+    CONSTRAINT UQ_Student_Class UNIQUE (userID, classID)
+);
 
 CREATE TABLE Assessment (
     assessmentID INT PRIMARY KEY,

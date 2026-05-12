@@ -21,12 +21,16 @@ router.post('/login', async (req, res) => {
     }
 });
 
-/** [BACK-USER-02]: Join Class Logic */
 router.post('/join-class', auth.authorize(['student']), async (req, res) => {
     try {
         const { classCode } = req.body;
+        const userId = req.user.id; // Extract from decoded JWT token
+        if (!userId) {
+            return res.status(401).json({ error: "User identity not found in session." });
+        }
         const pool = await ConnectionManager.getInstance().getPool();
 
+        // 1. Find the class
         const classResult = await pool.request()
             .input('code', sql.Int, classCode)
             .query('SELECT classID FROM CourseClass WHERE classCode = @code');
@@ -37,11 +41,21 @@ router.post('/join-class', auth.authorize(['student']), async (req, res) => {
 
         const classId = classResult.recordset[0].classID;
 
-        await pool.request()
-            .input('cid', sql.Int, classId)
-            .query('UPDATE CourseClass SET numStudents = numStudents + 1 WHERE classID = @cid');
+        // 2. Use the new DAL method to create the junction record
+        await userDAL.enrollStudentInClass(userId, classId);
 
-        res.json({ ok: true, message: 'Successfully joined class', classId });
+        res.json({ success: true, message: 'Successfully joined class' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+/** Fetch only classes for the logged-in student */
+router.get('/my-classes', auth.authorize(['student']), async (req, res) => {
+    try {
+        const userId = req.user.id; 
+        const classes = await userDAL.getStudentClasses(userId);
+        res.json(classes || []);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }

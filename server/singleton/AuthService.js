@@ -39,12 +39,15 @@ async login(email, password) {
     if (!isMatch) throw new Error('Invalid credentials');
 
     const token = jwt.sign(
-        { userId: user.UserID, role: user.UserRole, name: user.Name },
-        process.env.JWT_SECRET,
-        { expiresIn: '1d' }
+    { id: user.UserID, role: user.UserRole, name: user.Name }, 
+    process.env.JWT_SECRET,
+    { expiresIn: '1d' }
     );
 
-    return { token, user: { id: user.UserID, name: user.Name, role: user.UserRole } };
+     return { 
+    token, 
+    user: { id: user.UserID, name: user.Name, role: user.UserRole } 
+    };
 }
 
     /** Middleware: Verify JWT and Role */

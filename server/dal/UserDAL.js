@@ -52,6 +52,51 @@ class UserDAL {
             throw err;
         }
     }
+
+    async enrollStudentInClass(userId, classId) {
+        try {
+            const pool = await ConnectionManager.getInstance().getPool();
+            
+            // 1. Insert the enrollment record
+            await pool.request()
+                .input('uid', sql.Int, userId)
+                .input('cid', sql.Int, classId)
+                .query(`
+                    INSERT INTO StudentClasses (userID, classID) 
+                    VALUES (@uid, @cid)
+                `);
+    
+            // 2. Update the student count in the main class table
+            await pool.request()
+                .input('cid', sql.Int, classId)
+                .query(`
+                    UPDATE CourseClass 
+                    SET numStudents = numStudents + 1 
+                    WHERE classID = @cid
+                `);
+                
+            return true;
+        } catch (err) {
+            if (err.message.includes('UQ_Student_Class')) {
+                throw new Error("You are already enrolled in this class.");
+            }
+            throw err;
+        }
+    }
+
+    async getStudentClasses(userId) {
+        const pool = await ConnectionManager.getInstance().getPool();
+        const result = await pool.request()
+            .input('uid', sql.Int, userId)
+            .query(`
+                SELECT c.* FROM CourseClass c
+                JOIN StudentClasses sc ON c.classID = sc.classID
+                WHERE sc.userID = @uid
+            `);
+        return result.recordset;
+    }
+
+    
 }
 
 module.exports = new UserDAL();
