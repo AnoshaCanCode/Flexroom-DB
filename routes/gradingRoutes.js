@@ -135,4 +135,20 @@ router.get('/student-assessments/:classId/:studentId', async (req, res) => {
   }
 });
 
+
+//adding
+// Add this to the bottom of gradingRoutes.js (Right above module.exports)
+const submissionDAL = require('../server/dal/submissionDal'); // Ensure this relative path points to your SubmissionDAL file
+
+router.get('/submissions/assessment/:assessmentId', async (req, res) => {
+    try {
+        const { assessmentId } = req.params;
+        const data = await submissionDAL.getSubmissionsByAssessment(parseInt(assessmentId));
+        res.json(data);
+    } catch (err) {
+        console.error("Route Fetch Error:", err.message);
+        res.status(500).json({ error: err.message });
+    }
+});
+
 module.exports = router;

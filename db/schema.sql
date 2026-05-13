@@ -96,7 +96,7 @@ CREATE TABLE Assessment (
     marks INT NOT NULL,
     uploadingDate NVARCHAR(20) NOT NULL,
     dueDate NVARCHAR(20) NULL,
-    status NVARCHAR(20) DEFAULT 'unmarked'
+    status NVARCHAR(20) DEFAULT 'unmarked',
     -- Add these to support your gradingRoutes logic:--UPDATED!!
     questionFile VARBINARY(MAX) NULL, 
     solutionFile VARBINARY(MAX) NULL

@@ -1,50 +1,54 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import styles from './PeoplePage.module.css';
 
 const SubmissionsPage = () => {
+    const { id: assignmentId } = useParams(); // Matches :id in your routing pattern
     const navigate = useNavigate();
+    
+    const [pendingData, setPendingData] = useState([]);
+    const [markedData, setMarkedData] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-    // Placeholder assignment ID - replace with dynamic ID from props/context
-    const assignmentId = "assignment-123";
+    useEffect(() => {
+        const fetchSubmissions = async () => {
+            try {
+                // Attach token headers if auth interception is not automated globally
+                const token = localStorage.getItem('token'); 
+                const response = await axios.get(`/api/submissions/assessment/${assignmentId}`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                
+                setPendingData(response.data.pending);
+                setMarkedData(response.data.marked);
+            } catch (err) {
+                console.error("Error pulling submission information:", err);
+            } finally {
+                setLoading(false);
+            }
+        };
 
-    // Navigation handler
-    const handleRowClick = (student, type) => {
-        // You can determine the type (document/code) from the student object
-        // assuming your data structure has a 'type' property.
+        if (assignmentId) fetchSubmissions();
+    }, [assignmentId]);
+
+    const handleRowClick = (student, contextType) => {
         const assignmentType = student.type || 'document'; 
-        
-        navigate(`/evaluator/evaluate/${assignmentId}/${student.id}`, { 
+        // Directing layout to evaluations workspace with specific database primary keys
+        navigate(`/evaluator/evaluate/${assignmentId}/${student.UserID || student.id}`, { 
             state: { type: assignmentType } 
         });
     };
 
-    // Section 1: Submissions Data (Only S.No and Name)
-    const pendingSubmissions = {
-        title: 'Submissions',
-        data: [
-            { id: 1, name: 'Anosha Asher' },
-            { id: 2, name: 'Amal Fazeel' },
-            { id: 3, name: 'Muhammad Ibrahim' },
-            { id: 4, name: 'Faiqa Qureshi' },
-        ]
-    };
-
-    // Section 2: Marked Data (S.No, Name, and Marks)
-    const markedSubmissions = {
-        title: 'Marked',
-        data: [
-            { id: 1, name: 'Ali Ahsan', marks: '18/20' },
-            { id: 2, name: 'Zainab Ali', marks: '15/20' },
-            { id: 3, name: 'Mustafa Khan', marks: '19/20' },
-        ]
-    };
+    if (loading) {
+        return <div className="text-center p-5">Loading assessment data vectors...</div>;
+    }
 
     return (
         <div className={styles.pageContainer}>
             {/* --- SUBMISSIONS SECTION --- */}
             <div className={styles.headerContainer}>
-                <h1 className={styles.classTitle}>{pendingSubmissions.title}</h1>
+                <h1 className={styles.classTitle}>Submissions</h1>
             </div>
             <table className={styles.table}>
                 <thead>
@@ -54,16 +58,20 @@ const SubmissionsPage = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {pendingSubmissions.data.map((student) => (
-                        <tr 
-                            key={student.id} 
-                            onClick={() => handleRowClick(student, 'pending')}
-                            style={{ cursor: 'pointer' }}
-                        >
-                            <td>{student.id}.</td>
-                            <td>{student.name}</td>
-                        </tr>
-                    ))}
+                    {pendingData.length === 0 ? (
+                        <tr><td colSpan="2" className="text-center text-muted">No pending submissions found.</td></tr>
+                    ) : (
+                        pendingData.map((student, index) => (
+                            <tr 
+                                key={student.SubmissionID} 
+                                onClick={() => handleRowClick(student, 'pending')}
+                                style={{ cursor: 'pointer' }}
+                            >
+                                <td>{index + 1}.</td>
+                                <td>{student.Name}</td>
+                            </tr>
+                        ))
+                    )}
                 </tbody>
             </table>
 
@@ -71,7 +79,7 @@ const SubmissionsPage = () => {
 
             {/* --- MARKED SECTION --- */}
             <div className={styles.headerContainer}>
-                <h1 className={styles.classTitle}>{markedSubmissions.title}</h1>
+                <h1 className={styles.classTitle}>Marked</h1>
             </div>
             <table className={styles.table}>
                 <thead>
@@ -82,17 +90,21 @@ const SubmissionsPage = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {markedSubmissions.data.map((student) => (
-                        <tr 
-                            key={student.id} 
-                            onClick={() => handleRowClick(student, 'marked')}
-                            style={{ cursor: 'pointer' }}
-                        >
-                            <td>{student.id}.</td>
-                            <td>{student.name}</td>
-                            <td>{student.marks}</td>
-                        </tr>
-                    ))}
+                    {markedData.length === 0 ? (
+                        <tr><td colSpan="3" className="text-center text-muted">No evaluations processed yet.</td></tr>
+                    ) : (
+                        markedData.map((student, index) => (
+                            <tr 
+                                key={student.GradeID} 
+                                onClick={() => handleRowClick(student, 'marked')}
+                                style={{ cursor: 'pointer' }}
+                            >
+                                <td>{index + 1}.</td>
+                                <td>{student.Name}</td>
+                                <td>{`${student.TotalMarks}/${student.MaxMarks}`}</td>
+                            </tr>
+                        ))
+                    )}
                 </tbody>
             </table>
         </div>

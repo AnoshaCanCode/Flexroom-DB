@@ -7,6 +7,7 @@ const rateLimit = require('express-rate-limit');
 const gradingRoutes = require('./routes/gradingRoutes');
 const userRoutes = require('./routes/userRoutes');
 const fileRoutes = require('./routes/fileRoutes'); 
+const submissionRoutes = require('./routes/submissionRoutes');
 
 // ... other middleware like app.use(express.json()) ...
 
@@ -21,6 +22,7 @@ app.use(express.json({ limit: '10mb' }));
 app.use('/api/files', fileRoutes);
 app.use('/api/users', userRoutes); 
 app.use('/api/grading', gradingRoutes); // This will now handle the multipart assessments
+app.use('/api/submissions', submissionRoutes);
 
 // Rate Limiter
 const messageLimiter = rateLimit({

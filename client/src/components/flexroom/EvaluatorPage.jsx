@@ -93,7 +93,7 @@ function EvaluatorPage({ displayName: displayNameProp } = {}) {
         }
     };
     fetchAssignments();
-}, []);
+  }, []);
   // --- DATABASE LOGIC END ---
 
   return (
