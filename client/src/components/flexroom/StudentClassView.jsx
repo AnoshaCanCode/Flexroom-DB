@@ -1,16 +1,32 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import styles from '../DashboardLayout.module.css'; 
+import React, { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { getStudentAssessments } from '../../api/assignmentsApi';
+import styles from '../DashboardLayout.module.css';
 
 const StudentClassView = () => {
+    const { classId } = useParams();
     const navigate = useNavigate();
+    const [assignments, setAssignments] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-    // Mock data - replace with actual API call
-    const assignments = [
-        { id: 1, title: 'Assignment 1: Fork', status: 'Submitted', obtained: 18, total: 20 },
-        { id: 2, title: 'Class Activity 1', status: 'Assigned', obtained: null, total: 10 },
-        { id: 3, title: 'Assignment 2: Pipes', status: 'Submitted', obtained: 15, total: 20 },
-    ];
+    // Replace this with your actual logged-in user logic
+    const studentId = localStorage.getItem('userId') || 1; 
+
+    useEffect(() => {
+        const fetchAssignments = async () => {
+            try {
+                const response = await getStudentAssessments(classId, studentId);
+                setAssignments(response.data);
+            } catch (err) {
+                console.error("Error loading assignments:", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchAssignments();
+    }, [classId, studentId]);
+
+    if (loading) return <div className={styles.loading}>Loading Assignments...</div>;
 
     return (
         <div className={styles.dashboardContainer}>
@@ -40,8 +56,12 @@ const StudentClassView = () => {
                                     <td>{index + 1}</td>
                                     <td className={styles.assignmentTitle}>{assignment.title}</td>
                                     <td>
-                                        <span className={`${styles.statusBadge} ${assignment.status === 'Submitted' ? styles.statusSuccess : styles.statusPending}`}>
-                                            {assignment.status}
+                                        <span className={`${styles.statusBadge} ${
+                                            assignment.submissionStatus === 'submitted' 
+                                            ? styles.statusSuccess 
+                                            : styles.statusPending
+                                        }`}>
+                                            {assignment.submissionStatus}
                                         </span>
                                     </td>
                                     <td className={styles.marksColumn}>
@@ -52,7 +72,7 @@ const StudentClassView = () => {
                             ))
                         ) : (
                             <tr>
-                                <td colSpan="5" className={styles.noData}>No assignments found.</td>
+                                <td colSpan="5" className={styles.noData}>No assignments found for this class.</td>
                             </tr>
                         )}
                     </tbody>

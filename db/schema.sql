@@ -88,7 +88,7 @@ CREATE TABLE StudentClasses (--UPDATED!!
 );
 
 CREATE TABLE Assessment (
-    assessmentID INT PRIMARY KEY,
+    assessmentID INT PRIMARY KEY IDENTITY(1,1),--UPDATED CONSTRAINT!!
     classID INT NOT NULL REFERENCES CourseClass(classID),
     title NVARCHAR(200) NOT NULL,
     type NVARCHAR(20) NOT NULL,
@@ -97,7 +97,13 @@ CREATE TABLE Assessment (
     uploadingDate NVARCHAR(20) NOT NULL,
     dueDate NVARCHAR(20) NULL,
     status NVARCHAR(20) DEFAULT 'unmarked'
+    -- Add these to support your gradingRoutes logic:--UPDATED!!
+    questionFile VARBINARY(MAX) NULL, 
+    solutionFile VARBINARY(MAX) NULL
 );
+--UPDATED;
+ALTER TABLE Assessment dROP COLUMN SolutionKey
+ALTER TABLE Assessment dROP COLUMN SolutionKeyName
 
 """INSERT INTO Assessment
     (assessmentID, classID, title, type, marks, uploadingDate, dueDate, status)

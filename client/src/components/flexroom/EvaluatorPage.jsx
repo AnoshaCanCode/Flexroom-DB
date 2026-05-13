@@ -1,19 +1,12 @@
 import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Plus } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import Layout from './Layout';
+import { getAssessmentsByClass } from '../../api/assignmentsApi';
 
-const ASSIGNMENTS = [
-  { serial: 1, title: 'Assignment 1: Fork', submitted: 33, left: 3 },
-  { serial: 2, title: 'Class Activity 1', submitted: 1, left: 35 },
-  { serial: 3, title: 'Assignment 2: Pipes', submitted: 30, left: 5 },
-  { serial: 4, title: 'Quiz 1', submitted: 32, left: 4 },
-  { serial: 5, title: 'Assignment 3: MLFQ', submitted: 36, left: '-' },
-  { serial: 6, title: 'Quiz 2', submitted: 10, left: 26 },
-  { serial: 7, title: 'Class Activity 2', submitted: 29, left: 7 },
-];
-
+// Helper to get name from local storage
 function readDisplayName() {
   try {
     const ev = window.localStorage.getItem('flexroomDisplayNameEvaluator');
@@ -51,12 +44,11 @@ function EvaluatorModal({ open, onClose }) {
           <button onClick={onClose} className="btn-close btn-close-white" aria-label="Close"></button>
         </div>
         <div className="p-4 d-grid gap-3">
-          {/* Updated paths to match your folder structure requirements */}
           <Link 
             to="/create-code-assignment" 
             className="btn btn-outline-dark py-3 d-flex flex-column align-items-center" 
             style={{ borderColor: '#7d8b63' }}
-            onClick={onClose} // Close modal on redirect
+            onClick={onClose}
           >
             <strong>Upload Coding Assessment</strong>
             <small className="text-muted">Automated test cases & scripts</small>
@@ -66,7 +58,7 @@ function EvaluatorModal({ open, onClose }) {
             to="/create-doc-assignment" 
             className="btn btn-outline-dark py-3 d-flex flex-column align-items-center" 
             style={{ borderColor: '#7d8b63' }}
-            onClick={onClose} // Close modal on redirect
+            onClick={onClose}
           >
             <strong>Upload Doc Assessment</strong>
             <small className="text-muted">Instruction manuals or PDFs</small>
@@ -83,6 +75,26 @@ function EvaluatorModal({ open, onClose }) {
 function EvaluatorPage({ displayName: displayNameProp } = {}) {
   const resolvedName = displayNameProp?.trim() || readDisplayName();
   const [modalOpen, setModalOpen] = useState(false);
+  
+  // --- DATABASE LOGIC START ---
+  const [assignments, setAssignments] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchAssignments = async () => {
+        try {
+            // Using the function from your API file
+            const response = await getAssessmentsByClass(1); 
+            setAssignments(response.data);
+        } catch (err) {
+            console.error("Error fetching assessments:", err);
+        } finally {
+            setLoading(false);
+        }
+    };
+    fetchAssignments();
+}, []);
+  // --- DATABASE LOGIC END ---
 
   return (
     <Layout sidebarVariant="evaluator" displayName={resolvedName} defaultSidebarOpen={true}>
@@ -115,31 +127,36 @@ function EvaluatorPage({ displayName: displayNameProp } = {}) {
               </tr>
             </thead>
             <tbody>
-  {ASSIGNMENTS.map((row) => (
-    <tr key={row.serial} style={{ background: '#e9ecef' }}>
-      <td style={{ border: '1px solid black', padding: '10px 14px', color: '#2a2d26' }}>
-        {row.serial}.
-      </td>
-      {/* Wrap the Title in a Link to navigate to the Submissions page */}
-      <td style={{ border: '1px solid black', padding: '10px 14px', fontWeight: 500 }}>
-        <Link 
-          to={`/evaluator/submissions/${row.serial}`} 
-          style={{ color: '#2a2d26', textDecoration: 'none' }}
-          onMouseOver={(e) => e.target.style.textDecoration = 'underline'}
-          onMouseOut={(e) => e.target.style.textDecoration = 'none'}
-        >
-          {row.title}
-        </Link>
-      </td>
-      <td style={{ border: '1px solid black', padding: '10px 14px', color: '#2a2d26' }}>
-        {row.submitted}
-      </td>
-      <td style={{ border: '1px solid black', padding: '10px 14px', color: '#2a2d26' }}>
-        {row.left}
-      </td>
-    </tr>
-  ))}
-</tbody>
+              {loading ? (
+                <tr><td colSpan="4" className="text-center p-4">Loading assessments...</td></tr>
+              ) : assignments.length === 0 ? (
+                <tr><td colSpan="4" className="text-center p-4">No assessments found. Click + to create one.</td></tr>
+              ) : (
+                assignments.map((row, index) => (
+                  <tr key={row.serial || index} style={{ background: '#e9ecef' }}>
+                    <td style={{ border: '1px solid black', padding: '10px 14px', color: '#2a2d26' }}>
+                      {index + 1}.
+                    </td>
+                    <td style={{ border: '1px solid black', padding: '10px 14px', fontWeight: 500 }}>
+                      <Link 
+                        to={`/evaluator/submissions/${row.serial}`} 
+                        style={{ color: '#2a2d26', textDecoration: 'none' }}
+                        onMouseOver={(e) => e.target.style.textDecoration = 'underline'}
+                        onMouseOut={(e) => e.target.style.textDecoration = 'none'}
+                      >
+                        {row.title}
+                      </Link>
+                    </td>
+                    <td style={{ border: '1px solid black', padding: '10px 14px', color: '#2a2d26' }}>
+                      {row.submitted || 0}
+                    </td>
+                    <td style={{ border: '1px solid black', padding: '10px 14px', color: '#2a2d26' }}>
+                      {row.left || 0}
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
           </table>
         </div>
       </div>

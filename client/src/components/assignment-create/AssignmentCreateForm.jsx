@@ -56,9 +56,6 @@ function isTestCasesComplete(items) {
     return items.every((t) => String(t.inputText || '').trim() !== '' && Number(t.marks) > 0);
 }
 
-/**
- * @param {{ variant: 'document' | 'code' }} props
- */
 export default function AssignmentCreateForm({ variant }) {
     const navigate = useNavigate();
     const location = useLocation();
@@ -69,6 +66,8 @@ export default function AssignmentCreateForm({ variant }) {
         () => ({
             courseTitle: location.state?.courseTitle ?? 'Operating Systems',
             courseCode: location.state?.courseCode ?? 'BSCS-4J',
+            // Retrieve classId from state or default to 1 for testing
+            classId: location.state?.classId ?? 1, 
         }),
         [location.state]
     );
@@ -147,68 +146,53 @@ export default function AssignmentCreateForm({ variant }) {
         setSubmitting(true);
 
         try {
-            // 1. Prepare FormData for multipart/form-data submission
             const formData = new FormData();
             
-            // Basic Info
+            // 1. Basic Info
             formData.append('title', title.trim());
             formData.append('dueDate', dueDate);
             formData.append('assessmentType', variant === 'code' ? 'code' : 'document');
-            formData.append('courseTitle', defaults.courseTitle);
-            formData.append('courseCode', defaults.courseCode);
-            formData.append('role', 'evaluator'); 
+            formData.append('classId', defaults.classId); // CRITICAL: Required for SQL Join/Foreign Key
+            formData.append('totalMarks', totalMarks.trim() !== '' ? totalMarks.trim() : '0');
 
-            if (totalMarks.trim() !== '') {
-                formData.append('totalMarks', totalMarks.trim());
-            }
-
-            // 2. Append JSON data as strings
-            formData.append(
-                'rubric',
-                JSON.stringify(
-                    rubricItems.map((r, i) => ({
-                        order: i + 1,
-                        description: r.description.trim(),
-                        marks: Number(r.marks),
-                    }))
-                )
-            );
+            // 2. JSON Data
+            formData.append('rubric', JSON.stringify(
+                rubricItems.map((r, i) => ({
+                    order: i + 1,
+                    description: r.description.trim(),
+                    marks: Number(r.marks),
+                }))
+            ));
 
             if (variant === 'code') {
-                formData.append(
-                    'testCases',
-                    JSON.stringify(
-                        testCases.map((t, i) => ({
-                            order: i + 1,
-                            input: t.inputText.trim(),
-                            marks: Number(t.marks),
-                        }))
-                    )
-                );
+                formData.append('testCases', JSON.stringify(
+                    testCases.map((t, i) => ({
+                        order: i + 1,
+                        input: t.inputText.trim(),
+                        marks: Number(t.marks),
+                    }))
+                ));
             }
 
-            // 3. Append the binary Files
-            if (questionPdf) {
-                formData.append('questionPdf', questionPdf);
-            }
-            
-            if (solutionKey) {
-                formData.append('solutionKey', solutionKey);
+            // 3. Binary Files
+            if (questionPdf) formData.append('questionPdf', questionPdf);
+            if (solutionKey) formData.append('solutionKey', solutionKey);
+
+            // DEBUG: Log formData keys to browser console
+            console.log("Submitting Assessment Data...");
+            for (let [key, value] of formData.entries()) {
+                console.log(`${key}:`, value);
             }
 
             // 4. API Call
             await postCreateAssessment(formData);
-
+            
             setSuccess(true);
-            window.setTimeout(() => {
-                navigate('/evaluator', { replace: true });
-            }, 900);
+            setTimeout(() => navigate(-1), 1500);
 
         } catch (e) {
-            const msg =
-                e?.response?.data?.message ||
-                e?.message ||
-                'Could not create assignment. Please try again.';
+            console.error("Submission error:", e);
+            const msg = e?.response?.data?.error || e?.message || 'Could not create assignment.';
             setError(msg);
         } finally {
             setSubmitting(false);
@@ -245,7 +229,6 @@ export default function AssignmentCreateForm({ variant }) {
                                 onChange={(e) => setTitle(e.target.value)}
                                 onBlur={() => setTitleActive(false)}
                                 placeholder="Assignment title"
-                                aria-label="Assignment title"
                             />
                         )}
 
@@ -264,7 +247,6 @@ export default function AssignmentCreateForm({ variant }) {
                                 value={dueDate}
                                 onChange={(e) => setDueDate(e.target.value)}
                                 onBlur={() => setDueActive(false)}
-                                aria-label="Due date"
                             />
                         )}
                     </div>
@@ -285,11 +267,9 @@ export default function AssignmentCreateForm({ variant }) {
                                 className={styles.marksInput}
                                 type="number"
                                 min={0}
-                                placeholder="Marks"
                                 value={totalMarks}
                                 onChange={(e) => setTotalMarks(e.target.value)}
                                 onBlur={() => setMarksActive(false)}
-                                aria-label="Total marks"
                             />
                         )}
                     </div>
@@ -314,8 +294,7 @@ export default function AssignmentCreateForm({ variant }) {
                             disabled={!canSubmit || submitting}
                             onClick={handleCreateAssignment}
                         >
-                            Add
-                            {submitting && <span className={styles.loading}>Saving…</span>}
+                            {submitting ? 'Saving…' : 'Add'}
                         </button>
                     </div>
                 </section>
@@ -337,23 +316,14 @@ export default function AssignmentCreateForm({ variant }) {
                                         <input
                                             className={styles.rowMarks}
                                             type="number"
-                                            min={1}
                                             placeholder="Marks"
                                             value={row.marks}
                                             onChange={(e) => updateRubric(row.id, { marks: e.target.value })}
-                                            aria-label={`Rubric ${index + 1} marks`}
                                         />
                                     </div>
                                 </div>
                             ))}
-                            <button
-                                type="button"
-                                className={styles.addRowBtn}
-                                onClick={addRubricRow}
-                                aria-label="Add rubric criterion"
-                            >
-                                +
-                            </button>
+                            <button type="button" className={styles.addRowBtn} onClick={addRubricRow}>+</button>
                         </div>
                     </div>
 
@@ -369,30 +339,19 @@ export default function AssignmentCreateForm({ variant }) {
                                                 className={styles.rowInput}
                                                 placeholder="e.g. x = 3, y = -2"
                                                 value={row.inputText}
-                                                onChange={(e) =>
-                                                    updateTestCase(row.id, { inputText: e.target.value })
-                                                }
+                                                onChange={(e) => updateTestCase(row.id, { inputText: e.target.value })}
                                             />
                                             <input
                                                 className={styles.rowMarks}
                                                 type="number"
-                                                min={1}
                                                 placeholder="Marks"
                                                 value={row.marks}
                                                 onChange={(e) => updateTestCase(row.id, { marks: e.target.value })}
-                                                aria-label={`Test case ${index + 1} marks`}
                                             />
                                         </div>
                                     </div>
                                 ))}
-                                <button
-                                    type="button"
-                                    className={styles.addRowBtn}
-                                    onClick={addTestCaseRow}
-                                    aria-label="Add test case"
-                                >
-                                    +
-                                </button>
+                                <button type="button" className={styles.addRowBtn} onClick={addTestCaseRow}>+</button>
                             </div>
                         </div>
                     )}
