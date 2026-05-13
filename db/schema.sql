@@ -133,6 +133,36 @@ GO
     Foreign Key (AssignmentID) References Assessment(assessmentID) on delete cascade
 );
 
+ ------------------------updated--------------------------------
+-- 1. Update Submissions table to handle both perspectives
+ALTER TABLE Submissions 
+ADD status_eval NVARCHAR(50) DEFAULT 'unmarked'; -- 'unmarked' or 'marked'
+GO
+
+-- 2. Ensure student status is clean
+-- Options: 'unsubmitted', 'submitted', 'missed'
+ALTER TABLE Submissions 
+ALTER COLUMN Status NVARCHAR(50); 
+GO
+
+SELECT df.name AS ConstraintName
+FROM sys.default_constraints df
+INNER JOIN sys.columns c 
+    ON df.parent_object_id = c.object_id 
+    AND df.parent_column_id = c.column_id
+WHERE df.parent_object_id = OBJECT_ID('Submissions')
+AND c.name = 'Status';
+
+-- 1. Fix Submissions Table Status
+ALTER TABLE Submissions 
+DROP CONSTRAINT DF__Submissio__Statu__093F5D4E -- Drop existing default if you have one
+GO
+ALTER TABLE Submissions 
+ADD CONSTRAINT DF_Submissions_Status DEFAULT 'unsubmitted' FOR Status;
+GO
+
+select * from submissions
+------------------------------------------------------------------
 
 CREATE TABLE MatchResults (
     MatchID INT PRIMARY KEY IDENTITY(1,1) NOT NULL,
