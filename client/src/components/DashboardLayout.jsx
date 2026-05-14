@@ -10,18 +10,20 @@ const DashboardLayout = ({ userRole }) => {
 
     const displayName = useMemo(() => {
     try {
-        // 1. Get the main 'user' object we saved at login
-        const savedUser = window.localStorage.getItem('user');
+        // 1. Change localStorage to sessionStorage
+        // 2. Change 'user' to 'flexroom_user'
+        const savedUser = window.sessionStorage.getItem('flexroom_user');
         
         if (savedUser) {
             const parsed = JSON.parse(savedUser);
-            // 2. Return the name from that object
-            return parsed.name || 'User';
+            // Use .name or .Name depending on your SQL column casing
+            return parsed.name || parsed.Name || 'User';
         }
         
-        // 3. Keep your role-based fallbacks just in case
-        return userRole === 'evaluator' ? 'Rida Amir' : 'Student';
-    } catch {
+        // 3. Remove hardcoded names to avoid confusion during debugging
+        return userRole === 'evaluator' ? 'Evaluator' : 'Student';
+    } catch (err) {
+        console.error("Error parsing user from session:", err);
         return 'User';
     }
 }, [userRole]);

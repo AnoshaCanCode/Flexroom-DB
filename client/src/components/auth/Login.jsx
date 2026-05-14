@@ -6,6 +6,7 @@ import { FaArrowLeft, FaEnvelope, FaLock } from 'react-icons/fa';
 
 const Login = () => {
     const navigate = useNavigate();
+    const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [userRole, setUserRole] = useState('');

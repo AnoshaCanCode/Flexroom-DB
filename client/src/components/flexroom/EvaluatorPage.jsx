@@ -9,12 +9,20 @@ import { getAssessmentsByClass } from '../../api/assignmentsApi';
 // Helper to get name from local storage
 function readDisplayName() {
   try {
-    const ev = window.localStorage.getItem('flexroomDisplayNameEvaluator');
-    if (ev && ev.trim()) return ev.trim();
-    const generic = window.localStorage.getItem('flexroomDisplayName');
-    if (generic && generic.trim()) return generic.trim();
-  } catch (_) {}
-  return 'Hayyan';
+    // 1. Check the correct storage (sessionStorage) and correct key (flexroom_user)
+    const storedUser = window.sessionStorage.getItem('flexroom_user');
+    
+    if (storedUser) {
+      const parsed = JSON.parse(storedUser);
+      // 2. Return the name (checking both lower and uppercase 'n')
+      return parsed.name || parsed.Name || 'Evaluator';
+    }
+  } catch (err) {
+    console.error("Error reading display name:", err);
+  }
+  
+  // 3. Changed fallback from 'Hayyan' to 'Evaluator' to stop the placeholder from appearing
+  return 'Evaluator';
 }
 
 function CourseBanner() {
